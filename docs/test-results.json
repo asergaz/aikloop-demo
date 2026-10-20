@@ -1,0 +1,542 @@
+{
+  "generated": "2026-10-19",
+  "current": {
+    "version": "3.0.0",
+    "file": "openapi-3.0.0.json",
+    "totals": {
+      "pass": 19,
+      "total": 19
+    },
+    "summary": {
+      "getting-started": {
+        "pass": 4,
+        "total": 4
+      },
+      "accept-a-payment": {
+        "pass": 5,
+        "total": 5
+      },
+      "refunds": {
+        "pass": 4,
+        "total": 4
+      },
+      "list-payments": {
+        "pass": 4,
+        "total": 4
+      },
+      "webhooks": {
+        "pass": 1,
+        "total": 1
+      },
+      "changelog": {
+        "pass": 1,
+        "total": 1
+      }
+    }
+  },
+  "incoming": {
+    "version": "3.1.0",
+    "file": "incoming/openapi-3.1.0.json",
+    "totals": {
+      "pass": 14,
+      "total": 19
+    },
+    "summary": {
+      "getting-started": {
+        "pass": 4,
+        "total": 4
+      },
+      "accept-a-payment": {
+        "pass": 4,
+        "total": 5
+      },
+      "refunds": {
+        "pass": 4,
+        "total": 4
+      },
+      "list-payments": {
+        "pass": 2,
+        "total": 4
+      },
+      "webhooks": {
+        "pass": 0,
+        "total": 1
+      },
+      "changelog": {
+        "pass": 0,
+        "total": 1
+      }
+    }
+  },
+  "pages": [
+    {
+      "page": "getting-started",
+      "title": "Getting started",
+      "checks": [
+        {
+          "id": "endpoints",
+          "name": "Endpoints exist in the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` is in the spec.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` is in the spec.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "auth",
+          "name": "Authentication matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "params",
+          "name": "Parameters and headers match the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "runs",
+          "name": "Sample runs against the mock API",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` returned 201 (pay_1000).",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` returned 201 (pay_1000).",
+              "evidence": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": "accept-a-payment",
+      "title": "Accept a payment",
+      "checks": [
+        {
+          "id": "endpoints",
+          "name": "Endpoints exist in the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` is in the spec.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` is in the spec.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "auth",
+          "name": "Authentication matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "params",
+          "name": "Parameters and headers match the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "runs",
+          "name": "Sample runs against the mock API",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` returned 201 (pay_1000).",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/payments` returned 201 (pay_1000).",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "retry",
+          "name": "Retrying after a timeout is safe",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Sent the sample twice with the same key: one payment (pay_1000); the second call returned the same payment instead of a new one. A retry a minute before the 24 hours the page gives are up returned it too.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "fail",
+              "detail": "Says keys are kept for 24 hours, but the spec keeps them for 1 hour. Retrying a minute before the 24 hours are up created a second payment: the customer is charged twice.",
+              "evidence": {
+                "text": "If a request times out, retry it **with the same `Idempotency-Key`**. AIKloop returns the original result instead of creating a second payment. Keys are kept for 24 hours.",
+                "line": 27
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": "refunds",
+      "title": "Refund a payment",
+      "checks": [
+        {
+          "id": "endpoints",
+          "name": "Endpoints exist in the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/refunds` is in the spec.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/refunds` is in the spec.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "auth",
+          "name": "Authentication matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "params",
+          "name": "Parameters and headers match the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "runs",
+          "name": "Sample runs against the mock API",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/refunds` returned 201 (re_1000).",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`POST /v3/refunds` returned 201 (re_1000).",
+              "evidence": null
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": "list-payments",
+      "title": "List payments",
+      "checks": [
+        {
+          "id": "endpoints",
+          "name": "Endpoints exist in the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`GET /v3/payments` is in the spec.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "`GET /v3/payments` is in the spec.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "auth",
+          "name": "Authentication matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Sends the key as a Bearer token in the `Authorization` header.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "params",
+          "name": "Parameters and headers match the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "fail",
+              "detail": "`limit=100` is above the maximum of 50.",
+              "evidence": {
+                "text": "curl \"https://api.aikloop.example/v3/payments?limit=100&starting_after=pay_123\" \\",
+                "line": 11
+              }
+            }
+          ]
+        },
+        {
+          "id": "runs",
+          "name": "Sample runs against the mock API",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`GET /v3/payments` returned 200.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "fail",
+              "detail": "400: `limit=100` is above the maximum of 50.",
+              "evidence": {
+                "text": "curl \"https://api.aikloop.example/v3/payments?limit=100&starting_after=pay_123\" \\",
+                "line": 11
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": "webhooks",
+      "title": "Handle webhooks",
+      "checks": [
+        {
+          "id": "signing",
+          "name": "Signature header and rules match the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "`AIKloop-Signature`, HMAC-SHA256 and the 5-minute window all match the spec.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "fail",
+              "detail": "Says to reject events after 5 minutes; the spec says 3, so replayed events are accepted for longer than they should be.",
+              "evidence": {
+                "text": "4. Reject the event if `t` is more than 5 minutes old, to block replays.",
+                "line": 13
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "page": "changelog",
+      "title": "Changelog",
+      "checks": [
+        {
+          "id": "version",
+          "name": "Latest release matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "The latest entry is v3.0, the version in the spec.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "fail",
+              "detail": "The latest entry is v3.0; the spec is v3.1.0.",
+              "evidence": {
+                "text": "## v3.0 (2026-03-02)",
+                "line": 8
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

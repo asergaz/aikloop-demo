@@ -1,0 +1,33 @@
+{{ define "bodyclass" }}agent-view{{ end }}
+{{ define "main" }}
+<main class="overview wide">
+  <p class="kicker">Knowledge Loop demo</p>
+  <h1>{{ .Title }}</h1>
+  <p class="lead">An AI agent doesn't see the page you see. It reads the text behind it. On the left, what an agent gets from the "before" page: the HTML with the tags removed, without running scripts. On the right, what the "after" version gives it.</p>
+  {{ range .Params.pairs }}
+    {{ $path := cond (eq .page "_index") "" (printf "/%s" .page) }}
+    {{ $b := site.GetPage (printf "/before%s" $path) }}
+    {{ $a := site.GetPage (printf "/after%s" $path) }}
+  <section class="pair">
+    <h2>{{ .label }}</h2>
+    <p class="note">{{ .note }}</p>
+    <div class="cols">
+      <div class="col b">
+        <p class="col-head">Before · <a href="{{ $b.RelPermalink }}">HTML page</a> (no Markdown, no llms.txt)</p>
+        <pre>{{ partial "agent-text.txt" $b | htmlUnescape }}</pre>
+      </div>
+      <div class="col a">
+        {{ if .llms }}
+        <p class="col-head">After · <a href="{{ "after/llms.txt" | relURL }}">llms.txt</a></p>
+        <pre>{{ trim (partial "llms.txt" $) "\n" }}</pre>
+        {{ else }}
+        <p class="col-head">After · <a href="{{ ($a.OutputFormats.Get "markdown").RelPermalink }}">Markdown version</a></p>
+        <pre>{{ trim (partial "page-md.txt" $a | htmlUnescape) "\n" }}</pre>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+  {{ end }}
+  <p class="fine">This view shows the input. Whether a given agent then answers correctly still has to be measured by running real questions against both versions.</p>
+</main>
+{{ end }}

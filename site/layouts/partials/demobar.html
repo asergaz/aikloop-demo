@@ -1,0 +1,10 @@
+{{- /* The demo's top bar, on the demo pages only. The docs sites open in a new tab, clean, as if they
+  were the company's published docs: no demo bar and no links back into the demo. */ -}}
+<div class="demo-bar">
+  <span class="demo-tag">Demo · fictional API</span>
+  <a href="{{ "" | relURL }}">Overview</a>
+  <a href="{{ "before/" | relURL }}" class="b" target="_blank" rel="noopener">Before ↗</a>
+  <a href="{{ "after/" | relURL }}" class="a" target="_blank" rel="noopener">After ↗</a>
+  <a href="{{ "agent-view/" | relURL }}">What the agent sees</a>
+  <a href="{{ "docs-tests/" | relURL }}">Docs tests</a>
+</div>

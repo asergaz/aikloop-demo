@@ -1,0 +1,18 @@
+{{- $spec := partial "reference-data.html" . -}}
+{{- $g := index $spec.groups .Params.ref -}}
+<p>Base URL: <code>{{ $spec.baseUrl }}</code></p>
+<p>{{ $spec.auth }}</p>
+{{- range $g.endpoints }}
+<h2><span class="method">{{ .method }}</span> {{ .path }}</h2>
+<p>{{ .summary }}</p>
+{{- with .params }}
+<table><tr><th>Field</th><th>Type</th><th>Description</th></tr>
+{{- range . }}<tr><td><code>{{ .name }}</code></td><td>{{ .type }}</td><td>{{ .description }}</td></tr>{{ end }}
+</table>
+{{- end }}
+{{- with .headers }}
+<table><tr><th>Header</th><th>Description</th></tr>
+{{- range . }}<tr><td><code>{{ .name }}</code></td><td>{{ .description }}</td></tr>{{ end }}
+</table>
+{{- end }}
+{{- end }}

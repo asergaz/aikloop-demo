@@ -1,0 +1,9 @@
+{{- /* What an agent gets from a "before" page: the HTML with tags removed, scripts not run.
+  Takes the "before" page and keeps what its HTML holds as text: the sidebar and the page content. */ -}}
+{{- $content := .Content -}}
+{{- with .Params.fragment }}{{ $content = (resources.Get .).Content }}{{ end -}}
+{{- $html := printf "%s%s" (partial "sidebar.html" .) $content -}}
+{{- $t := $html | plainify | htmlUnescape -}}
+{{- $t = replaceRE `[ \t]+` " " $t -}}
+{{- $t = replaceRE `\s*\n\s*` "\n" $t -}}
+{{- trim $t " \n" -}}

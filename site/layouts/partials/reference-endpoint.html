@@ -1,0 +1,28 @@
+{{- /* One OpenAPI operation as {method, path, summary, params: [{name, type, description}], headers: [{name, description}]}. Called by reference-data.html. */ -}}
+{{- $params := slice -}}
+{{- $headers := slice -}}
+{{- range .op.parameters -}}
+  {{- if eq .in "header" -}}
+    {{- $headers = $headers | append (dict "name" .name "description" .description) -}}
+  {{- else -}}
+    {{- $params = $params | append (dict "name" .name "type" .schema.type "description" .description) -}}
+  {{- end -}}
+{{- end -}}
+{{- with .op.requestBody -}}
+  {{- with index .content "application/x-www-form-urlencoded" -}}
+    {{- $props := .schema.properties -}}
+    {{- $required := .schema.required | default slice -}}
+    {{- /* Required fields first, in the spec's order, then the others. */ -}}
+    {{- range $name := $required -}}
+      {{- with index $props $name -}}
+        {{- $params = $params | append (dict "name" $name "type" .type "description" .description) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- range $name, $p := $props -}}
+      {{- if not (in $required $name) -}}
+        {{- $params = $params | append (dict "name" $name "type" $p.type "description" $p.description) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return dict "method" .method "path" .path "summary" .op.summary "params" $params "headers" $headers -}}

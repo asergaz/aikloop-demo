@@ -1,0 +1,7 @@
+{{- /* The main content of a docs page. */ -}}
+{{- if eq .Layout "reference" -}}
+<p class="spec-link">Generated from the OpenAPI spec: <a href="{{ printf "%s/openapi.json" .Params.version | relURL }}">Download openapi.json</a></p>
+{{ partial "reference-html.html" . }}
+{{- else -}}
+{{ .Content }}
+{{- end -}}

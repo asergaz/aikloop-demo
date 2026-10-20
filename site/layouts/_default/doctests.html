@@ -1,0 +1,70 @@
+{{ define "bodyclass" }}doctests{{ end }}
+{{ define "main" }}
+{{ $r := hugo.Data.doctests }}
+<main class="overview wide">
+  <p class="kicker">Knowledge Loop demo</p>
+  <h1>Docs tests</h1>
+  <p class="lead">Every page of the docs gives guidance you can check: this endpoint exists, this sample works, retrying is safe. These tests check that guidance against the OpenAPI spec and against a mock of the API built from it. When the next release's spec arrives, the same tests show the docs team what it breaks, before it ships.</p>
+  {{ with $r }}
+  {{ $runs := slice (dict "key" "current" "label" "Current release" "class" "a" "run" .current) }}
+  {{ with .incoming }}{{ $runs = $runs | append (dict "key" "incoming" "label" "Incoming release" "class" "b" "run" .) }}{{ end }}
+  <div class="scores">
+    {{ range $runs }}
+    <div class="score {{ .class }}"><span class="label">{{ .label }} · v{{ .run.version }}</span><strong>{{ .run.totals.pass }} of {{ .run.totals.total }}</strong> tests pass</div>
+    {{ end }}
+  </div>
+
+  <table class="tests">
+    <thead><tr><th>Page</th><th>Test</th>{{ range $runs }}<th>{{ .label }} · v{{ .run.version }}</th>{{ end }}</tr></thead>
+    <tbody>
+    {{ range .pages }}
+      {{ $page := . }}{{ $shown := slice }}
+      {{ range $i, $c := .checks }}
+      <tr{{ if eq $i 0 }} id="{{ $page.page }}" class="first"{{ end }}>
+        {{ if eq $i 0 }}<th rowspan="{{ len $page.checks }}" scope="rowgroup"><a href="{{ printf "after/%s/" $page.page | relURL }}" target="_blank" rel="noopener">{{ $page.title }}</a></th>{{ end }}
+        <td>{{ $c.name }}</td>
+        {{ range $c.results }}
+        <td class="{{ .status }}" data-label="{{ cond (eq .release "current") "Current release" "Incoming release" }} · v{{ .version }}"><span class="mark">{{ if eq .status "pass" }}✓ Pass{{ else }}✗ Fail{{ end }}</span>
+          {{ if eq .status "fail" }}<span class="why">{{ .detail | markdownify }}</span>{{ with .evidence }}{{ $key := printf "%d" .line }}{{ if not (in $shown $key) }}{{ $shown = $shown | append $key }}<code class="line">after/{{ $page.page }}.md, line {{ .line }}: {{ .text }}</code>{{ end }}{{ end }}{{ end }}
+        </td>
+        {{ end }}
+      </tr>
+      {{ end }}
+    {{ end }}
+    </tbody>
+  </table>
+
+  <section class="drift">
+    <h2>How the tests work</h2>
+    <p class="note">The tests read each page's Markdown file, the same file the site publishes. Every <code>curl</code> sample is run as written against a mock of the API that knows only what the spec says, so a sample that's wrong for the spec fails here before a reader runs it. The text around the samples is checked as well: each value the page states, such as how long idempotency keys are kept, the webhook time window or the latest version, is compared with the spec.</p>
+    <table class="checks">
+      <thead><tr><th>Test</th><th>What it checks</th></tr></thead>
+      <tbody>
+        <tr><td>Endpoints exist in the spec</td><td>Every <code>curl</code> sample calls an endpoint that's in the spec.</td></tr>
+        <tr><td>Authentication matches the spec</td><td>Samples send a Bearer token in the <code>Authorization</code> header, never <code>?api_key=</code> in the URL.</td></tr>
+        <tr><td>Parameters and headers match the spec</td><td>Every field and query parameter is in the spec, required ones are there, values have the right type and are within limits, and required headers such as <code>Idempotency-Key</code> are sent.</td></tr>
+        <tr><td>Sample runs against the mock API</td><td>The sample, run as written, gets a successful response from the mock.</td></tr>
+        <tr><td>Retrying after a timeout is safe</td><td>The page tells you to retry with the same <code>Idempotency-Key</code>, and sending its sample twice creates one payment, not two. If the page says how long keys are kept, the mock retries again a minute before that time is up, with keys expiring when the spec says, and it must still be one payment.</td></tr>
+        <tr><td>Signature header and rules match the spec</td><td>The webhooks page names the header, the algorithm and the time window that the spec gives.</td></tr>
+        <tr><td>Latest release matches the spec</td><td>The changelog's latest entry is the version in the spec.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="drift">
+    <h2>When the next release arrives</h2>
+    <p class="note">The spec reaches the docs team before the release does. The tests turn it into a list of what to fix, and the same steps run on a laptop and on GitHub.</p>
+    <ol class="steps">
+      <li><strong>A new spec is ready for review.</strong> When the next release's spec is ready, we run the same tests on the same docs against it.</li>
+      <li><strong>The tests run against both specs.</strong> The tests, the mock API and the unreleased spec live in a private repository, which holds the docs too: only the docs and the site are published. In VS Code: <code>python tests/run_doc_tests.py</code> there. On GitHub: a workflow in that repository runs the same command whenever the incoming spec or the tests change. The table above shows the result: each failure in the incoming column names the file, the line and the reason.</li>
+      <li><strong>Claude drafts the fix.</strong> In VS Code, ask Claude Code to <code>/fix-docs</code>. On GitHub, the workflow asks Claude to follow the same instructions and opens a pull request with the fix in the private repository, so nothing about the release is public before it ships. Claude compares the two specs, fixes the failing lines and anything else the release makes wrong, adds the changelog entry, and runs the tests until the incoming column passes.</li>
+      <li><strong>A person reviews the fix, and the release ships with its docs.</strong> Once the pull request is approved and merged, the incoming spec moves to the docs' <code>specs/</code> folder and the docs and the site are pushed to the public repository. The spec becomes the current release, and the site publishes it and the updated docs together.</li>
+    </ol>
+  </section>
+
+  <p class="fine">Tests run on {{ .generated }}. The current release is <a href="{{ "after/openapi.json" | relURL }}" target="_blank" rel="noopener">openapi.json</a> v{{ .current.version }}{{ with .incoming }}; the incoming release is v{{ .version }}, not published yet: it stays in the private repository until it ships{{ end }}. The API reference pages aren't tested here because they're generated from the spec. The "before" docs aren't tested either: they're HTML pages that were never kept as code, so there's nothing to test them with. To run the tests yourself: <code>python tests/run_doc_tests.py</code> in the private <code>aikloop-private</code> repository.</p>
+  {{ else }}
+  <p>No test results yet. Run <code>python tests/run_doc_tests.py</code> in the private <code>aikloop-private</code> repository.</p>
+  {{ end }}
+</main>
+{{ end }}

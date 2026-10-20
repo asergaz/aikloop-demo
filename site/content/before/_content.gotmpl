@@ -1,0 +1,28 @@
+{{- /* The "before" pages. Each file in ../docs/before/ holds only the page content, from its <h1> to the end
+  of the main column. This adds them as pages so they get the same demo bar, sidebar and page frame as the
+  "after" pages (layouts/_default/before.html). The title is read from the <h1>; the list sets the sidebar order.
+  The docs home, before/_index.html, is the section page: see _index.md. */ -}}
+{{- $pages := slice
+  (dict "path" "getting-started" "group" "Docs" "weight" 1)
+  (dict "path" "accept-a-payment" "group" "Docs" "weight" 2)
+  (dict "path" "refunds" "group" "Docs" "weight" 3)
+  (dict "path" "list-payments" "group" "Docs" "weight" 4)
+  (dict "path" "webhooks" "group" "Docs" "weight" 5)
+  (dict "path" "changelog" "group" "Docs" "weight" 6)
+  (dict "path" "reference/payments" "group" "API reference" "weight" 1)
+  (dict "path" "reference/refunds" "group" "API reference" "weight" 2)
+  (dict "path" "reference/webhooks" "group" "API reference" "weight" 3)
+-}}
+{{- range $pages }}
+  {{- $file := printf "before/%s.html" .path }}
+  {{- $html := (resources.Get $file).Content }}
+  {{- $title := index (index (findRESubmatch `<h1>(.*?)</h1>` $html 1) 0) 1 | htmlUnescape }}
+  {{- $.AddPage (dict
+    "path" .path
+    "title" $title
+    "layout" "before"
+    "params" (dict "version" "before" "group" .group)
+    "weight" .weight
+    "content" (dict "mediaType" "text/html" "value" $html)
+  ) }}
+{{- end }}

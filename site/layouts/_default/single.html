@@ -1,0 +1,13 @@
+{{ define "main" }}
+<div class="docs">
+  {{ partial "sidebar.html" . }}
+  <main class="doc">
+    <h1>{{ .Title }}</h1>
+    {{ if eq .Params.version "after" }}<p class="md-link">{{ with .OutputFormats.Get "markdown" }}<a href="{{ .RelPermalink }}">View as Markdown</a>{{ end }}{{ partial "test-badge.html" . }}</p>{{ end }}
+    {{ partial "body.html" . }}
+  </main>
+  <nav class="toc" aria-label="On this page">
+    {{ $toc := .TableOfContents }}{{ if and $toc (ne (string $toc) "<nav id=\"TableOfContents\"></nav>") }}<p class="nav-group">On this page</p>{{ $toc }}{{ end }}
+  </nav>
+</div>
+{{ end }}

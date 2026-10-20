@@ -1,0 +1,29 @@
+<h1>Accept a payment</h1>
+<h2 id="create-the-charge">Create the charge</h2>
+<p>Send a <code>POST</code> request to <code>/v2/charges</code>:</p>
+<table>
+	<thead>
+			<tr>
+					<th>Parameter</th>
+					<th>Description</th>
+			</tr>
+	</thead>
+	<tbody>
+			<tr>
+					<td><code>amount</code></td>
+					<td>Amount as a decimal string, for example <code>&quot;10.50&quot;</code>.</td>
+			</tr>
+			<tr>
+					<td><code>currency</code></td>
+					<td>Optional. Defaults to <code>usd</code>.</td>
+			</tr>
+			<tr>
+					<td><code>card_token</code></td>
+					<td>Token from AIKloop.js.</td>
+			</tr>
+	</tbody>
+</table>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;-webkit-text-size-adjust:none;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>curl https://api.aikloop.example/v2/charges?api_key<span style="color:#f92672">=</span>YOUR_KEY <span style="color:#ae81ff">\
+</span></span></span><span style="display:flex;"><span>  -d amount<span style="color:#f92672">=</span>10.50 -d card_token<span style="color:#f92672">=</span>tok_123
+</span></span></code></pre></div><h2 id="if-something-goes-wrong">If something goes wrong</h2>
+<p>If a request times out, just send it again.</p>

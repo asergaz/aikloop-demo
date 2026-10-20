@@ -1,0 +1,86 @@
+# Knowledge Loop demo: the docs of "AIKloop Payments", a fictional API, before and after.
+baseURL = "http://localhost:1313/"   # The GitHub Pages workflow sets the published address when it builds.
+title = "AIKloop Payments docs (fictional demo)"
+locale = "en"
+disableKinds = ["taxonomy", "term", "RSS", "sitemap"]
+
+[mediaTypes."text/markdown"]
+  suffixes = ["md"]
+
+[outputFormats.markdown]
+  mediaType = "text/markdown"
+  baseName = "index"
+  isPlainText = true
+  permalinkable = false
+
+[outputFormats.llms]
+  mediaType = "text/plain"
+  baseName = "llms"
+  isPlainText = true
+
+[outputFormats.openapi]
+  mediaType = "application/json"
+  baseName = "openapi"
+  isPlainText = true
+
+# The demo pages (/, /agent-view/, /docs-tests/) and two clean docs sites, /before/ and /after/.
+# Each docs site has its own openapi.json, and only /after/ has llms.txt and Markdown copies:
+# see the outputs in content/before/_index.md and ../docs/after/_index.md. Nothing is at the root
+# for agents, so an agent testing one docs site can't land on the other's files.
+[outputs]
+  home = ["HTML"]
+  page = ["HTML"]
+  section = ["HTML"]
+
+# The docs come from ../docs, which the docs team owns. This site is only the engine.
+# Declaring a mount replaces Hugo's default for that folder, so the site's own folders are listed too.
+[[module.mounts]]
+  source = "content"
+  target = "content"
+[[module.mounts]]
+  source = "static"
+  target = "static"
+[[module.mounts]]
+  source = "assets"
+  target = "assets"
+[[module.mounts]]
+  source = "data"
+  target = "data"
+
+# "After": the docs as code, in Markdown.
+[[module.mounts]]
+  source = "../docs/after"
+  target = "content/after"
+
+# "Before": the legacy docs. Each HTML file holds only the page content; content/before/_content.gotmpl
+# reads them through the assets mount and wraps them in the site's page frame. Their script is static.
+[[module.mounts]]
+  source = "../docs/before"
+  target = "assets/before"
+[[module.mounts]]
+  source = "../docs/before/js"
+  target = "static/before/js"
+
+# The released OpenAPI specs, read as hugo.Data.specs. The newest is the current release
+# (layouts/partials/current-spec.html): the API reference is rendered from it, and both docs
+# sites publish it unchanged as openapi.json. Unreleased specs stay in the private repository.
+[[module.mounts]]
+  source = "../docs/specs"
+  target = "data/specs"
+
+# The docs test results, written by the tests in the private aikloop-private repository.
+[[module.mounts]]
+  source = "../docs/test-results.json"
+  target = "data/doctests.json"
+
+[markup.goldmark.renderer]
+  unsafe = true
+[markup.tableOfContents]
+  startLevel = 2
+  endLevel = 3
+
+[security]
+  # The "before" pages are HTML content (content/before/_content.gotmpl). Hugo blocks HTML content by default.
+  allowContent = ['! ^text/org$']
+[security.funcs]
+  getenv = []

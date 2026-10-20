@@ -1,0 +1,20 @@
+{{- $spec := partial "reference-data.html" . -}}
+{{- $g := index $spec.groups .Params.ref -}}
+Generated from the OpenAPI spec: [openapi.json]({{ "after/openapi.json" | absURL }})
+
+Base URL: `{{ $spec.baseUrl }}`
+
+{{ $spec.auth }}
+{{ range $g.endpoints }}
+## {{ .method }} {{ .path }}
+
+{{ .summary }}
+{{ with .params }}
+| Field | Type | Description |
+| --- | --- | --- |
+{{ range . }}| `{{ .name }}` | {{ .type }} | {{ .description }} |
+{{ end }}{{ end }}{{ with .headers }}
+| Header | Description |
+| --- | --- |
+{{ range . }}| `{{ .name }}` | {{ .description }} |
+{{ end }}{{ end }}{{ end }}

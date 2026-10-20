@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="{{ site.Language.Locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Title }}{{ if not .IsHome }} · AIKloop docs{{ end }}</title>
+  <link rel="stylesheet" href="{{ "css/docs.css" | relURL }}">
+  {{ with .OutputFormats.Get "markdown" }}<link rel="alternate" type="text/markdown" href="{{ .RelPermalink }}">{{ end }}
+</head>
+<body class="{{ block "bodyclass" . }}{{ end }}">
+  {{ if not .Params.version }}{{ partial "demobar.html" . }}{{ end }}
+  {{ block "main" . }}{{ end }}
+</body>
+</html>

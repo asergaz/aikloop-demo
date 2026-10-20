@@ -1,0 +1,19 @@
+{{- /* The docs table of contents, for the "before" and "after" pages. */ -}}
+{{- $v := .Params.version | default "after" -}}
+{{- $sec := site.GetPage (printf "/%s" $v) -}}
+<aside class="sidebar">
+  <a class="logo" href="{{ $sec.RelPermalink }}">AIKloop <span>docs</span></a>
+  {{- range slice "Docs" "API reference" }}
+  {{- $g := . }}
+  <p class="nav-group">{{ $g }}</p>
+  <ul>
+    {{- range where $sec.RegularPages.ByWeight "Params.group" $g }}
+    <li><a href="{{ .RelPermalink }}"{{ if eq .RelPermalink $.RelPermalink }} class="current"{{ end }}>{{ .Title }}</a></li>
+    {{- end }}
+  </ul>
+  {{- end }}
+  {{- if eq $v "after" }}
+  <p class="nav-group">For AI agents</p>
+  <ul><li><a href="{{ "after/llms.txt" | relURL }}">llms.txt</a></li></ul>
+  {{- end }}
+</aside>

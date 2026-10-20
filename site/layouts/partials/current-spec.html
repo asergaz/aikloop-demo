@@ -1,0 +1,15 @@
+{{- /* The current release's OpenAPI spec: the one in ../specs/ with the highest info.version.
+  Used by reference-data.html and index.openapi.json. */ -}}
+{{- $current := dict -}}
+{{- $currentKey := "" -}}
+{{- range $file, $spec := hugo.Data.specs -}}
+  {{- with $spec.info -}}
+    {{- $v := split .version "." -}}
+    {{- $key := printf "%06d.%06d.%06d" (int (index $v 0)) (int (index $v 1)) (int (index $v 2)) -}}
+    {{- if gt $key $currentKey -}}
+      {{- $currentKey = $key -}}
+      {{- $current = $spec -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return $current -}}

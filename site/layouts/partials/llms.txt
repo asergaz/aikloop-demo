@@ -1,0 +1,17 @@
+# AIKloop Payments API
+
+> AIKloop Payments (a fictional sandbox API used for a documentation demo) lets developers accept card payments, issue refunds and receive webhook events. The current version is v3. Versions v1 and v2 are deprecated: don't use /v1 or /v2 endpoints, query-string API keys, decimal amounts, a default currency, page/per_page pagination, or the X-AIKloop-Signature header with HMAC-SHA1. The Changelog has the full old-versus-new table.
+
+Base URL: https://api.aikloop.example/v3
+{{- $sec := site.GetPage "/after" }}
+{{- range slice "Docs" "API reference" }}
+
+## {{ . }}
+{{ range where $sec.RegularPages.ByWeight "Params.group" . }}
+- [{{ .Title }}]({{ (.OutputFormats.Get "markdown").Permalink }}): {{ .Params.summary }}
+{{- end }}
+{{- end }}
+
+## Optional
+
+- [OpenAPI spec]({{ "after/openapi.json" | absURL }}): the full machine-readable spec, OpenAPI 3.1, for tools and code generation

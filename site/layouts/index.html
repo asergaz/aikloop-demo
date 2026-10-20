@@ -1,0 +1,23 @@
+{{ define "bodyclass" }}demo-home{{ end }}
+{{ define "main" }}
+<main class="overview">
+  <p class="kicker">Knowledge Loop demo</p>
+  <h1>Same docs, two versions</h1>
+  <p class="lead">AIKloop Payments is a fictional API. Its docs exist in two versions. Both look fine to a person. The difference is what an AI coding agent can get out of them.</p>
+  <div class="choices">
+    <a class="choice b" href="{{ "before/" | relURL }}" target="_blank" rel="noopener">
+      <span class="label">Before</span>
+      <strong>Stale docs</strong>
+      <span>The same pages, but the docs were never updated after v3: old endpoints, and nothing says they're out of date. The API reference is drawn by JavaScript. No Markdown, no llms.txt.</span>
+    </a>
+    <a class="choice a" href="{{ "after/" | relURL }}" target="_blank" rel="noopener">
+      <span class="label">After</span>
+      <strong>After a Knowledge Loop pass</strong>
+      <span>The same pages, updated for v3, with a changelog of what changed. The API reference is generated when the site is built. Every page also in Markdown, and an llms.txt file that tells agents which version is current and what not to use.</span>
+    </a>
+  </div>
+  <a class="agent-link" href="{{ "agent-view/" | relURL }}">See what an AI agent gets from each version →</a><br>
+  <a class="agent-link" href="{{ "docs-tests/" | relURL }}">See the docs tests, and what happens when the API changes →</a>
+  <p class="fine">Built with Hugo. Both versions use the same layout and table of contents, and both API references come from the same API spec. The difference is the content and what an agent can read. Domains end in .example, a reserved ending that can never point to a real site.</p>
+</main>
+{{ end }}

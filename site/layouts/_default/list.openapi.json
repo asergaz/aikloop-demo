@@ -1,0 +1,3 @@
+{{- /* The current release's OpenAPI spec (the newest in ../docs/specs/), published unchanged as
+  openapi.json in each docs site: /before/openapi.json and /after/openapi.json. */ -}}
+{{- jsonify (dict "indent" "  ") (partial "current-spec.html" .) -}}

@@ -1,0 +1,9 @@
+{{- /* Whether one docs page passes its docs tests against the current API version, and when the
+  tests last ran. Plain text: the docs site doesn't link into the demo. The incoming version's
+  results are only on the demo's Docs tests page. Takes the page. */ -}}
+{{- $slug := .File.ContentBaseName -}}
+{{- with hugo.Data.doctests -}}
+  {{- $version := .current.version -}}
+  {{- $date := .generated -}}
+  {{- with index .current.summary $slug }} <span class="tested{{ if ne .pass .total }} failing{{ end }}">{{ if eq .pass .total }}✓ Tested with v{{ $version }}{{ else }}✗ Fails with v{{ $version }}{{ end }} · {{ $date }}</span>{{ end -}}
+{{- end -}}

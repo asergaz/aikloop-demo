@@ -1,0 +1,26 @@
+{{- /* Reads the OpenAPI spec into what the API reference pages show:
+  {baseUrl, auth, groups: {payments: {title, endpoints: [{method, path, summary, params: [{name, type, description}], headers: [{name, description}]}]}}}.
+  One group per tag. Used by reference-html.html and reference-md.txt. */ -}}
+{{- $s := partial "current-spec.html" . -}}
+{{- $groups := dict -}}
+{{- range $tag := $s.tags -}}
+  {{- $endpoints := slice -}}
+  {{- range $path, $item := $s.paths -}}
+    {{- range $method := slice "post" "get" "put" "patch" "delete" -}}
+      {{- with index $item $method -}}
+        {{- if in .tags $tag.name -}}
+          {{- $endpoints = $endpoints | append (partial "reference-endpoint.html" (dict "method" (upper $method) "path" $path "op" .)) -}}
+        {{- end -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- range $name, $item := $s.webhooks -}}
+    {{- with $item.post -}}
+      {{- if in .tags $tag.name -}}
+        {{- $endpoints = $endpoints | append (partial "reference-endpoint.html" (dict "method" "EVENT" "path" $name "op" .)) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+  {{- $groups = merge $groups (dict (lower $tag.name) (dict "title" $tag.name "endpoints" $endpoints)) -}}
+{{- end -}}
+{{- return dict "baseUrl" (index $s.servers 0).url "auth" $s.info.description "groups" $groups -}}
