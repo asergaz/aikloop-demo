@@ -67,6 +67,11 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap"]
 [[module.mounts]]
   source = "../docs/specs"
   target = "data/specs"
+# The same specs as files, so openapi.json can be published byte for byte
+# (layouts/_default/list.openapi.json).
+[[module.mounts]]
+  source = "../docs/specs"
+  target = "assets/specs"
 
 # The released specs at /specs/<file>, linked from the Docs tests page. The incoming release's
 # spec and the docs test results are in that page's own folder, content/docs-tests/, written by

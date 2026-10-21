@@ -1,3 +1,7 @@
 {{- /* The current release's OpenAPI spec (the newest in ../docs/specs/), published unchanged as
-  openapi.json in each docs site: /before/openapi.json and /after/openapi.json. */ -}}
-{{- jsonify (dict "indent" "  ") (partial "current-spec.html" .) -}}
+  openapi.json in each docs site: /before/openapi.json and /after/openapi.json. The file is copied
+  as the API's build wrote it, so its keys keep their order (openapi, info and servers first). */ -}}
+{{- $version := (partial "current-spec.html" .).info.version -}}
+{{- range resources.Match "specs/*.json" -}}
+  {{- if eq (index (transform.Unmarshal .) "info" "version") $version }}{{ .Content }}{{ end -}}
+{{- end -}}
