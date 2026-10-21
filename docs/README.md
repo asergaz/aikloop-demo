@@ -15,5 +15,5 @@ The next release's spec isn't here: it's not public until the release ships. It 
 
 1. The release's spec arrives in the private repository, in `specs/incoming/`.
 2. The tests there list what it breaks in these docs, with the file and line.
-3. Claude drafts the fix, and a pull request with it opens in the private repository. A person reviews and merges it.
+3. Claude drafts the fix, and a pull request with it opens in the private repository. A human reviews and merges it.
 4. The spec moves into `specs/` here, and the docs are published to the public repository. The site publishes the release with its docs.

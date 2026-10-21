@@ -5,7 +5,7 @@ outputs: ["HTML"]
 pairs:
   - label: "The front door"
     page: "_index"
-    note: "Both docs homes say the same thing to a person. The \"after\" version also has llms.txt: a few lines telling an agent which version is current, what not to use, and where each page lives, as Markdown."
+    note: "Both docs homes say the same thing to a human. The \"after\" version also has llms.txt: a few lines telling an agent which version is current, what not to use, and where each page lives, as Markdown."
     llms: true
   - label: "Getting started"
     page: "getting-started"
