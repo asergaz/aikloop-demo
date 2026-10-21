@@ -5,6 +5,9 @@
 {{- range $g.endpoints }}
 <h2><span class="method">{{ .method }}</span> {{ .path }}</h2>
 <p>{{ .summary }}</p>
+{{- with .body }}
+<p>Request body: {{ if eq . "application/x-www-form-urlencoded" }}form-encoded ({{ end }}<code>{{ . }}</code>{{ if eq . "application/x-www-form-urlencoded" }}){{ end }}.</p>
+{{- end }}
 {{- with .params }}
 <table><tr><th>Field</th><th>Type</th><th>Description</th></tr>
 {{- range . }}<tr><td><code>{{ .name }}</code></td><td>{{ .type }}</td><td>{{ .description }}</td></tr>{{ end }}

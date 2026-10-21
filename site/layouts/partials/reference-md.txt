@@ -9,7 +9,9 @@ Base URL: `{{ $spec.baseUrl }}`
 ## {{ .method }} {{ .path }}
 
 {{ .summary }}
-{{ with .params }}
+{{ with .body }}
+Request body: {{ if eq . "application/x-www-form-urlencoded" }}form-encoded (`{{ . }}`){{ else }}`{{ . }}`{{ end }}.
+{{ end }}{{ with .params }}
 | Field | Type | Description |
 | --- | --- | --- |
 {{ range . }}| `{{ .name }}` | {{ .type }} | {{ .description }} |

@@ -12,7 +12,7 @@
     });
     return t;
   }
-  // One operation as {method, path, summary, params, headers}: header parameters apart,
+  // One operation as {method, path, summary, body, params, headers}: header parameters apart,
   // then the other parameters and the form fields, required fields first.
   function endpoint(method, path, op) {
     var params = [], headers = [];
@@ -26,7 +26,8 @@
       required.forEach(function (n) { if (props[n]) params.push({ name: n, type: props[n].type, description: props[n].description }); });
       Object.keys(props).sort().forEach(function (n) { if (required.indexOf(n) < 0) params.push({ name: n, type: props[n].type, description: props[n].description }); });
     }
-    return { method: method, path: path, summary: op.summary, params: params, headers: headers };
+    var body = Object.keys((op.requestBody && op.requestBody.content) || {})[0] || "";
+    return { method: method, path: path, summary: op.summary, body: body, params: params, headers: headers };
   }
   function endpoints(spec, tag) {
     var list = [];
@@ -51,6 +52,10 @@
     endpoints(spec, tag.name).forEach(function (ep) {
       var h = el("h2"); h.appendChild(el("span", "method", ep.method)); h.appendChild(document.createTextNode(" " + ep.path)); app.appendChild(h);
       app.appendChild(el("p", null, ep.summary));
+      if (ep.body) {
+        var b = el("p"); b.appendChild(document.createTextNode("Request body: " + (ep.body === "application/x-www-form-urlencoded" ? "form-encoded (" : "")));
+        b.appendChild(el("code", null, ep.body)); b.appendChild(document.createTextNode(ep.body === "application/x-www-form-urlencoded" ? ")." : ".")); app.appendChild(b);
+      }
       if (ep.params.length) app.appendChild(table(["Field", "Type", "Description"], ep.params.map(function (p) { return [p.name, p.type, p.description]; })));
       if (ep.headers.length) app.appendChild(table(["Header", "Description"], ep.headers.map(function (h) { return [h.name, h.description]; })));
     });

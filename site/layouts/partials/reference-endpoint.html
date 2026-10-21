@@ -1,6 +1,8 @@
-{{- /* One OpenAPI operation as {method, path, summary, params: [{name, type, description}], headers: [{name, description}]}. Called by reference-data.html. */ -}}
+{{- /* One OpenAPI operation as {method, path, summary, body, params: [{name, type, description}], headers: [{name, description}]}.
+     body is the request body's content type, or "". Called by reference-data.html. */ -}}
 {{- $params := slice -}}
 {{- $headers := slice -}}
+{{- $body := "" -}}
 {{- range .op.parameters -}}
   {{- if eq .in "header" -}}
     {{- $headers = $headers | append (dict "name" .name "description" .description) -}}
@@ -9,6 +11,7 @@
   {{- end -}}
 {{- end -}}
 {{- with .op.requestBody -}}
+  {{- range $type, $_ := .content }}{{ $body = $type }}{{ end -}}
   {{- with index .content "application/x-www-form-urlencoded" -}}
     {{- $props := .schema.properties -}}
     {{- $required := .schema.required | default slice -}}
@@ -25,4 +28,4 @@
     {{- end -}}
   {{- end -}}
 {{- end -}}
-{{- return dict "method" .method "path" .path "summary" .op.summary "params" $params "headers" $headers -}}
+{{- return dict "method" .method "path" .path "summary" .op.summary "body" $body "params" $params "headers" $headers -}}

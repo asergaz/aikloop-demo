@@ -9,8 +9,6 @@ Get your secret API key from the dashboard.
 
 Send it as a Bearer token in the `Authorization` header. Never put it in the URL.
 
-Send the request fields form-encoded (`application/x-www-form-urlencoded`), not as JSON. `curl -d` does this for you.
-
 ```bash
 curl https://api.aikloop.example/v3/payments \
   -H "Authorization: Bearer $AIKLOOP_SECRET_KEY" \

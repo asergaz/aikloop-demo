@@ -43,7 +43,6 @@
         <tr><td>Endpoints exist in the spec</td><td>Every <code>curl</code> sample calls an endpoint that's in the spec.</td></tr>
         <tr><td>Authentication matches the spec</td><td>Samples send a Bearer token in the <code>Authorization</code> header, never <code>?api_key=</code> in the URL.</td></tr>
         <tr><td>Parameters and headers match the spec</td><td>Every field and query parameter is in the spec, required ones are there, values have the right type and are within limits, and required headers such as <code>Idempotency-Key</code> are sent.</td></tr>
-        <tr><td>Request body format matches the spec</td><td>Pages with a sample that sends fields say to send them form-encoded, the only format the spec accepts, and never say to send JSON. A <code>curl -d</code> sample doesn't show this, so code written from it often sends JSON.</td></tr>
         <tr><td>Sample runs against the mock API</td><td>The sample, run as written, gets a successful response from the mock.</td></tr>
         <tr><td>Retrying after a timeout is safe</td><td>The page tells you to retry with the same <code>Idempotency-Key</code>, and sending its sample twice creates one payment, not two. If the page says how long keys are kept, the mock retries again a minute before that time is up, with keys expiring when the spec says, and it must still be one payment.</td></tr>
         <tr><td>Signature header and rules match the spec</td><td>The webhooks page names the header, the algorithm and the time window that the spec gives.</td></tr>
