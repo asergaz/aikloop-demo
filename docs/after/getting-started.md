@@ -7,7 +7,7 @@ summary: "Authenticate with a Bearer token and make your first v3 payment"
 
 Get your secret API key from the dashboard.
 
-Send it as a Bearer token in the `Authorization` header. Never put it in the URL.
+Send it as a Bearer token in the `Authorization` header. Never put it in the URL, where it ends up in logs and browser history.
 
 ```bash
 curl https://api.aikloop.example/v3/payments \
