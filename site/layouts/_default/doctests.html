@@ -51,20 +51,22 @@
     </table>
   </section>
 
+  {{ $demo := "https://www.linkedin.com/in/asergaz/" }}
   <section class="drift">
-    <h2>When the next release arrives</h2>
-    <p class="note">The spec reaches the docs team before the release does. The tests turn it into a list of what to fix, and the same steps run on a laptop and on GitHub.</p>
-    <ol class="steps">
-      <li><strong>A new spec is ready for review.</strong> When the next release's spec is ready, we run the same tests on the same docs against it.</li>
-      <li><strong>The tests run against both specs.</strong> The tests, the mock API and the unreleased spec live in a private repository, which holds the docs too: only the docs and the site are published. In VS Code: <code>python tests/run_doc_tests.py</code> there. On GitHub: a workflow in that repository runs the same command whenever the incoming spec or the tests change. The table above shows the result: each failure in the incoming column names the file, the line and the reason.</li>
-      <li><strong>Claude drafts the fix.</strong> In VS Code, ask Claude Code to <code>/fix-docs</code>. On GitHub, the workflow asks Claude to follow the same instructions and opens a pull request with the fix in the private repository, so nothing about the release is public before it ships. Claude compares the two specs, fixes the failing lines and anything else the release makes wrong, adds the changelog entry, and runs the tests until the incoming column passes.</li>
-      <li><strong>A human reviews the fix, and the release ships with its docs.</strong> Once the pull request is approved and merged, the incoming spec moves to the docs' <code>specs/</code> folder and the docs and the site are pushed to the public repository. The spec becomes the current release, and the site publishes it and the updated docs together.</li>
-    </ol>
+    <h2>See it catch the next release</h2>
+    <p class="note">The table above shows the docs as they are today{{ with .incoming }}, and what the unreleased v{{ .version }} breaks in them{{ end }}. The interesting part happens before the release ships: the unreleased spec is tested privately against the same docs, Claude drafts the fixes as a pull request, and a human reviews them. The release ships with its docs already right.</p>
+    <p class="note">In a live demo, you'll see:</p>
+    <ul class="steps">
+      <li><strong>What the next release breaks.</strong> Which pages, which lines and why, before any customer reads them.</li>
+      <li><strong>Claude fixing it.</strong> In VS Code with one command, or on GitHub as a pull request that opens on its own.</li>
+      <li><strong>The release going out.</strong> A human merges the fix, and the site updates with the release.</li>
+    </ul>
+    <a class="cta" href="{{ $demo }}" target="_blank" rel="noopener">Book a demo →</a>
   </section>
 
-  <p class="fine">Tests run on {{ .generated }}. The current release is <a href="{{ "after/openapi.json" | relURL }}" target="_blank" rel="noopener">openapi.json</a> v{{ .current.version }}{{ with .incoming }}; the incoming release is v{{ .version }}, not published yet: it stays in the private repository until it ships{{ end }}. The API reference pages aren't tested here because they're generated from the spec. The "before" docs aren't tested either: they're HTML pages that were never kept as code, so there's nothing to test them with. To run the tests yourself: <code>python tests/run_doc_tests.py</code> in the private <code>aikloop-private</code> repository.</p>
+  <p class="fine">Tests run on {{ .generated }}. The current release is <a href="{{ "after/openapi.json" | relURL }}" target="_blank" rel="noopener">openapi.json</a> v{{ .current.version }}{{ with .incoming }}; the incoming release is v{{ .version }}, not published yet{{ end }}. The API reference pages aren't tested here because they're generated from the spec. The "before" docs aren't tested either: they're HTML pages that were never kept as code, so there's nothing to test them with. To see the tests run, <a href="{{ $demo }}" target="_blank" rel="noopener">ask for a demo</a>.</p>
   {{ else }}
-  <p>No test results yet. Run <code>python tests/run_doc_tests.py</code> in the private <code>aikloop-private</code> repository.</p>
+  <p>No test results yet.</p>
   {{ end }}
 </main>
 {{ end }}

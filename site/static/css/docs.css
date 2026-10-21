@@ -111,6 +111,8 @@ table.tests code.line { display:block; margin-top:.35rem; font-size:.78rem; back
 table.checks td:first-child { width:16rem; font-weight:600; }
 @media (max-width: 760px) { table.checks td:first-child { width:35%; } }
 .steps > li { margin-bottom:1rem; }
+.cta { display:inline-block; margin-top:.5rem; padding:.6rem 1.2rem; background:var(--brand); color:#fff; font-weight:600; text-decoration:none; border-radius:6px; }
+.cta:hover, .cta:focus-visible { background:#2f47d6; }
 @media (max-width: 760px) {
   .scores { grid-template-columns:1fr; }
   table.tests, table.tests tbody, table.tests tr, table.tests th, table.tests td { display:block; width:auto; }
