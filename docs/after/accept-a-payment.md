@@ -7,7 +7,7 @@ summary: "Create a payment with amounts in minor units, a required currency and 
 
 ## Create the payment
 
-Send a `POST` request to `/v3/payments`:
+Send a `POST` request to `/v3/payments`, with the fields form-encoded, not as JSON:
 
 | Parameter | Description |
 | --- | --- |

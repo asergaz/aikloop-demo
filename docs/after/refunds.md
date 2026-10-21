@@ -5,7 +5,7 @@ group: "Docs"
 summary: "Refund all or part of a payment with POST /v3/refunds"
 ---
 
-To refund a payment, send a `POST` request to `/v3/refunds`. Leave out `amount_minor` to refund the full amount.
+To refund a payment, send a `POST` request to `/v3/refunds`, with the fields form-encoded, not as JSON. Leave out `amount_minor` to refund the full amount.
 
 ```bash
 curl https://api.aikloop.example/v3/refunds \

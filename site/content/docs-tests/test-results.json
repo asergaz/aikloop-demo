@@ -4,21 +4,21 @@
     "version": "3.0.0",
     "file": "openapi-3.0.0.json",
     "totals": {
-      "pass": 19,
-      "total": 19
+      "pass": 22,
+      "total": 22
     },
     "summary": {
       "getting-started": {
-        "pass": 4,
-        "total": 4
-      },
-      "accept-a-payment": {
         "pass": 5,
         "total": 5
       },
+      "accept-a-payment": {
+        "pass": 6,
+        "total": 6
+      },
       "refunds": {
-        "pass": 4,
-        "total": 4
+        "pass": 5,
+        "total": 5
       },
       "list-payments": {
         "pass": 4,
@@ -38,21 +38,21 @@
     "version": "3.1.0",
     "file": "incoming/openapi-3.1.0.json",
     "totals": {
-      "pass": 14,
-      "total": 19
+      "pass": 17,
+      "total": 22
     },
     "summary": {
       "getting-started": {
-        "pass": 4,
-        "total": 4
-      },
-      "accept-a-payment": {
-        "pass": 4,
+        "pass": 5,
         "total": 5
       },
+      "accept-a-payment": {
+        "pass": 5,
+        "total": 6
+      },
       "refunds": {
-        "pass": 4,
-        "total": 4
+        "pass": 5,
+        "total": 5
       },
       "list-payments": {
         "pass": 2,
@@ -135,6 +135,28 @@
               "spec": "incoming/openapi-3.1.0.json",
               "status": "pass",
               "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "body",
+          "name": "Request body format matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Says to send the fields form-encoded, the only format `POST /v3/payments` accepts.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Says to send the fields form-encoded, the only format `POST /v3/payments` accepts.",
               "evidence": null
             }
           ]
@@ -229,6 +251,28 @@
               "spec": "incoming/openapi-3.1.0.json",
               "status": "pass",
               "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "body",
+          "name": "Request body format matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Says to send the fields form-encoded, the only format `POST /v3/payments` accepts.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Says to send the fields form-encoded, the only format `POST /v3/payments` accepts.",
               "evidence": null
             }
           ]
@@ -348,6 +392,28 @@
               "spec": "incoming/openapi-3.1.0.json",
               "status": "pass",
               "detail": "Every field, query parameter and required header is in the spec, with valid values.",
+              "evidence": null
+            }
+          ]
+        },
+        {
+          "id": "body",
+          "name": "Request body format matches the spec",
+          "results": [
+            {
+              "release": "current",
+              "version": "3.0.0",
+              "spec": "openapi-3.0.0.json",
+              "status": "pass",
+              "detail": "Says to send the fields form-encoded, the only format `POST /v3/refunds` accepts.",
+              "evidence": null
+            },
+            {
+              "release": "incoming",
+              "version": "3.1.0",
+              "spec": "incoming/openapi-3.1.0.json",
+              "status": "pass",
+              "detail": "Says to send the fields form-encoded, the only format `POST /v3/refunds` accepts.",
               "evidence": null
             }
           ]
