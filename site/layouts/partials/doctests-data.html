@@ -1,0 +1,8 @@
+{{- /* The docs test results, from test-results.json in the Docs tests page's folder
+  (content/docs-tests/), where the tests in the private aikloop-private repository write them.
+  Returns nil if there are none. */ -}}
+{{- $r := false -}}
+{{- with site.GetPage "/docs-tests" -}}
+  {{- with .Resources.Get "test-results.json" -}}{{- $r = . | transform.Unmarshal -}}{{- end -}}
+{{- end -}}
+{{- return $r -}}

@@ -1,6 +1,6 @@
 {{ define "bodyclass" }}doctests{{ end }}
 {{ define "main" }}
-{{ $r := hugo.Data.doctests }}
+{{ $r := partialCached "doctests-data.html" . "doctests" }}
 <main class="overview wide">
   <p class="kicker">Knowledge Loop demo</p>
   <h1>Docs tests</h1>
@@ -15,7 +15,7 @@
   </div>
 
   <table class="tests">
-    <thead><tr><th>Page</th><th>Test</th>{{ range $runs }}<th>{{ .label }} · v{{ .run.version }}</th>{{ end }}</tr></thead>
+    <thead><tr><th>Page</th><th>Test</th>{{ range $runs }}<th>{{ .label }} · v{{ .run.version }} {{ $name := path.Base .run.file }}{{ $url := printf "specs/%s" $name | relURL }}{{ with $.Resources.Get $name }}{{ $url = .RelPermalink }}{{ end }}<a class="spec-link" href="{{ $url }}" target="_blank" rel="noopener">{{ $name }}</a></th>{{ end }}</tr></thead>
     <tbody>
     {{ range .pages }}
       {{ $page := . }}{{ $shown := slice }}
@@ -64,7 +64,7 @@
     <a class="cta" href="{{ $demo }}" target="_blank" rel="noopener">Book a demo →</a>
   </section>
 
-  <p class="fine">Tests run on {{ .generated }}. The current release is <a href="{{ "after/openapi.json" | relURL }}" target="_blank" rel="noopener">openapi.json</a> v{{ .current.version }}{{ with .incoming }}; the incoming release is v{{ .version }}, not published yet{{ end }}. The API reference pages aren't tested here because they're generated from the spec. The "before" docs aren't tested either: they're HTML pages that were never kept as code, so there's nothing to test them with. To see the tests run, <a href="{{ $demo }}" target="_blank" rel="noopener">ask for a demo</a>.</p>
+  <p class="fine">The API reference pages aren't tested here because they're generated from the spec. The "before" docs aren't tested either: they're HTML pages that were never kept as code, so there's nothing to test them with. To see the tests run, <a href="{{ $demo }}" target="_blank" rel="noopener">ask for a demo</a>.</p>
   {{ else }}
   <p>No test results yet.</p>
   {{ end }}

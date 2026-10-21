@@ -20,7 +20,7 @@ The demo opens Before and After in a new tab. Neither docs site links to the oth
 
 | Folder | Who owns it | What it is |
 | --- | --- | --- |
-| `docs/` | The docs team | `before/` (legacy HTML), `after/` (the docs as code), `specs/` (the released OpenAPI specs) and `test-results.json` (written by the private tests). See `docs/README.md`. |
+| `docs/` | The docs team | `before/` (legacy HTML), `after/` (the docs as code), and `specs/` (the released OpenAPI specs). See `docs/README.md`. |
 | `site/` | Whoever runs the website | The Hugo engine: templates, styles and the demo pages. It reads everything else from `../docs/`. See `site/README.md`. |
 | `.github/workflows/pages.yml` | | Builds the site and publishes it on GitHub Pages on every push to `main`. |
 

@@ -63,15 +63,17 @@ disableKinds = ["taxonomy", "term", "RSS", "sitemap"]
 
 # The released OpenAPI specs, read as hugo.Data.specs. The newest is the current release
 # (layouts/partials/current-spec.html): the API reference is rendered from it, and both docs
-# sites publish it unchanged as openapi.json. Unreleased specs stay in the private repository.
+# sites publish it unchanged as openapi.json. The incoming release's spec isn't here: see below.
 [[module.mounts]]
   source = "../docs/specs"
   target = "data/specs"
 
-# The docs test results, written by the tests in the private aikloop-private repository.
+# The released specs at /specs/<file>, linked from the Docs tests page. The incoming release's
+# spec and the docs test results are in that page's own folder, content/docs-tests/, written by
+# the tests in the private aikloop-private repository.
 [[module.mounts]]
-  source = "../docs/test-results.json"
-  target = "data/doctests.json"
+  source = "../docs/specs"
+  target = "static/specs"
 
 [markup.goldmark.renderer]
   unsafe = true

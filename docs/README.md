@@ -7,9 +7,8 @@ The docs of "AIKloop Payments", the fictional API of the Knowledge Loop demo. Th
 | `before/` | The legacy docs: HTML pages, never kept as code. The docs were never updated after v3, and the API reference is drawn by JavaScript. Each file holds only the page content; the site adds the page frame around it and publishes them at `/before/`. Never tested or edited. |
 | `after/` | The docs as code: one Markdown page per topic, updated for v3. The site publishes them at `/after/` as HTML pages, Markdown copies and `llms.txt`, and generates the API reference pages listed in `after/reference/` from the spec. |
 | `specs/` | The OpenAPI spec of each release, as the API's build produces it. The newest is the current release. Both docs sites publish it as `openapi.json`. |
-| `test-results.json` | The latest docs tests results. Written by the tests in the private `aikloop-private` repository, not by hand. |
 
-The next release's spec isn't here: it's not public until the release ships. It waits in the private repository, where the tests run against it.
+The next release's spec waits in the private repository, where the tests run against it, and moves into `specs/` when the release ships. The test results and a copy of that spec are in `../site/content/docs-tests/`, next to the Docs tests page: the tests write them, not the docs team.
 
 ## A new release, step by step
 

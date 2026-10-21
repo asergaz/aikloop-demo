@@ -14,7 +14,7 @@ The site has three parts:
 | Before | The legacy docs: HTML pages, never updated after v3, with an API reference drawn by JavaScript, and `openapi.json`. No Markdown, no `llms.txt`. Each file holds only the page content; `content/before/_content.gotmpl` adds them as pages with the same frame as "after". | `../docs/before/`, `content/before/` |
 | After | The docs as code, updated for v3. The site renders each page as HTML and as Markdown, generates the API reference from the spec, and builds `llms.txt` from the table of contents, plus `openapi.json`. | `../docs/after/`, `../docs/specs/` |
 | What the agent sees | Each "before" page as an agent gets it (HTML with tags removed, scripts not run), next to what the "after" version gives it | `content/agent-view.md`, `layouts/_default/agent-view.html` |
-| Docs tests | The docs tested against the current release's spec and the incoming one, and the steps the docs team takes when a release arrives | `layouts/_default/doctests.html`, results from `../docs/test-results.json` |
+| Docs tests | The docs tested against the current release's spec and the incoming one, and the steps the docs team takes when a release arrives | `layouts/_default/doctests.html`, `content/docs-tests/`: the page, the test results (`test-results.json`) and the incoming release's spec, all written by the tests in `aikloop-private` except the page |
 
 How the docs sites stay clean:
 
