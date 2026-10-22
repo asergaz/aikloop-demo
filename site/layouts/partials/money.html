@@ -1,0 +1,3 @@
+{{- /* Dollars, with enough decimals that sub-cent costs don't round to zero. */ -}}
+{{- $v := float . -}}
+{{- if ge $v 0.995 -}}{{ printf "$%.2f" $v }}{{- else if ge $v 0.01 -}}{{ printf "$%.3f" $v }}{{- else -}}{{ printf "$%.4f" $v }}{{- end -}}

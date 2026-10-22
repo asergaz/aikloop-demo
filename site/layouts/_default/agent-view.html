@@ -1,9 +1,199 @@
 {{ define "bodyclass" }}agent-view{{ end }}
 {{ define "main" }}
+{{- /* The agent test results come from data/agent_results.json, written by the agent tests in the
+     private aikloop-private repository (agent-tests/run_agent_tests.py export). */ -}}
+{{- $d := hugo.Data.agent_results -}}
+{{- $titles := dict -}}
+{{- range $d.questions }}{{ $titles = merge $titles (dict (string .id) .title) }}{{ end -}}
+{{- $kinds := dict
+  "old-endpoint" "Used an endpoint from the old guide that the API no longer has"
+  "key-in-url" "Put the API key in the URL, as the old guide does"
+  "json-body" "Sent the fields as JSON; the API only takes them form-encoded"
+  "webhook" "Checked webhook signatures the old way: an old header and algorithm"
+  "other" "Something else went wrong" -}}
 <main class="overview wide">
   <p class="kicker">Knowledge Loop demo</p>
   <h1>{{ .Title }}</h1>
-  <p class="lead">An AI agent doesn't see the page you see. It reads the text behind it. On the left, what an agent gets from the "before" page: the HTML with the tags removed, without running scripts. On the right, what the "after" version gives it.</p>
+  <p class="lead">The same AI agent, the same questions, two versions of the docs. First what the agent's code did with each version, then the text it actually reads on each page.</p>
+
+  {{ with $d }}
+  {{ $first := index .runs 0 }}
+  <section class="results" id="results">
+    <h2>What the agents did with each version</h2>
+    <p class="note">Claude Code wrote code for seven everyday tasks, such as charging a card, refunding half a payment or verifying a webhook. Each task was asked {{ $first.repeats }} times per version, every time in a new session that could only read that version's docs. Then each answer's code ran against a mock of the API. Two models took part: Opus 5.5, and the smaller and cheaper Haiku 5.5, the kind teams often use for automated work. Run on {{ (time.AsTime $first.date).Format "2 January 2006" }}.</p>
+
+    <div class="models">
+      {{ range .runs }}
+      {{ $run := . }}
+      <div class="model">
+        <h3>{{ .label }}</h3>
+        <div class="scores">
+          {{ range $s := slice "before" "after" }}{{ with index $run.sites $s }}
+          <div class="score {{ cond (eq $s "before") "b" "a" }}">
+            <span class="label">{{ $s }}</span>
+            <strong>{{ .works }} of {{ .answers }}</strong><span class="what">answers with working code</span>
+            <span class="cost">Cost {{ partial "money.html" .cost }} · {{ lang.FormatNumberCustom 0 .tokens }} tokens · {{ .pages }} pages</span>
+          </div>
+          {{ end }}{{ end }}
+        </div>
+        {{ with $run.sites.before }}
+        <p class="why">
+          {{- $without := sub .answers .read_spec -}}
+          {{- if eq $without 0 -}}
+          With the old docs, every answer went to the API spec to check the guides. The code worked {{ .works }} of {{ .answers }} times, but each answer cost more and read more pages than with the updated docs.
+          {{- else -}}
+          With the old docs, answers that opened the API spec worked {{ .works_with_spec }} of {{ .read_spec }} times. Answers that trusted the guides worked {{ sub .works .works_with_spec }} of {{ $without }} times.
+          {{- end -}}
+        </p>
+        {{ end }}
+      </div>
+      {{ end }}
+    </div>
+
+    <div class="viz-legend" aria-hidden="true"><span class="key b"></span>Before <span class="key a"></span>After</div>
+    <h3 class="viz-title">Answers with working code, by question</h3>
+    <div class="multiples">
+      {{ range $i, $run := .runs }}<figure class="chart" data-run="{{ $i }}" data-measure="works"><figcaption>{{ $run.label }}</figcaption><div class="plot"></div></figure>{{ end }}
+    </div>
+    <h3 class="viz-title">Cost per answer, by question (average)</h3>
+    <div class="multiples">
+      {{ range $i, $run := .runs }}<figure class="chart" data-run="{{ $i }}" data-measure="cost"><figcaption>{{ $run.label }}</figcaption><div class="plot"></div></figure>{{ end }}
+    </div>
+    <p class="qkey">{{ range $i, $q := .questions }}{{ if $i }} · {{ end }}<b>{{ $q.id }}</b> {{ $q.title }}{{ end }}</p>
+
+    <h3>What went wrong</h3>
+    <div class="scroll">
+    <table class="failures">
+      <thead><tr><th>Model</th><th>Question</th><th>What the code did</th><th>The request</th><th>What the API said</th></tr></thead>
+      <tbody>
+      {{ range .runs }}{{ $run := . }}{{ range $s, $site := .sites }}{{ range $site.failures }}
+        <tr>
+          <td>{{ $run.label }}, {{ $s }}</td>
+          <td>{{ .question }}. {{ index $titles (string .question) }}<span class="times">{{ .answers }} of {{ $run.repeats }} answers</span></td>
+          <td>{{ index $kinds .kind }}</td>
+          <td>{{ with .request }}<code>{{ . }}</code>{{ else }}–{{ end }}</td>
+          <td>{{ if eq .kind "webhook" }}Rejected a genuine webhook event.{{ else }}{{ .why | markdownify }}{{ end }}</td>
+        </tr>
+      {{ end }}{{ end }}{{ end }}
+      </tbody>
+    </table>
+    </div>
+
+    <details class="numbers">
+      <summary>All the numbers</summary>
+      {{ range .runs }}{{ $run := . }}
+      <h4>{{ .label }}</h4>
+      <div class="scroll">
+      <table class="by-question">
+        <thead>
+          <tr><th rowspan="2">Question</th>{{ range $s := slice "before" "after" }}<th colspan="{{ cond (eq $s "after") 8 7 }}" class="{{ cond (eq $s "before") "b" "a" }}">{{ $s }}</th>{{ end }}</tr>
+          <tr>{{ range $s := slice "before" "after" }}<th>works</th><th>cost (average)</th><th>tokens (average)</th><th>pages (average)</th><th>seconds (average)</th><th>read spec</th><th>hedged</th>{{ if eq $s "after" }}<th>read llms.txt</th>{{ end }}{{ end }}</tr>
+        </thead>
+        <tbody>
+        {{ range $q := $d.questions }}
+          <tr><th>{{ $q.id }}. {{ $q.title }}</th>
+          {{ range $s := slice "before" "after" }}{{ with index $run.sites $s }}{{ range .questions }}{{ if eq .id $q.id }}
+            <td>{{ .works }} of {{ .answers }}</td><td>{{ partial "money.html" .cost }}</td><td>{{ lang.FormatNumberCustom 0 .tokens }}</td><td>{{ math.Round .pages }}</td><td>{{ math.Round .seconds }}</td><td>{{ .read_spec }} of {{ .answers }}</td><td>{{ .hedged }} of {{ .answers }}</td>{{ if eq $s "after" }}<td>{{ .read_llms_txt }} of {{ .answers }}</td>{{ end }}
+          {{ end }}{{ end }}{{ end }}{{ end }}
+          </tr>
+        {{ end }}
+        </tbody>
+      </table>
+      </div>
+      {{ end }}
+    </details>
+
+    <p class="fine">Cost is at API list prices, as Claude Code reports it. Tokens count every model in a session, including the small model Claude Code uses to read each page for the agent. "Hedged" means the answer gave more than one version of the code. These results come from one agent tool, on a fictional API whose docs were written for this demo, with {{ $first.repeats }} answers per question: they show what can happen, not a benchmark.</p>
+  </section>
+  <script type="application/json" id="agent-results">{{ $d | jsonify | safeJS }}</script>
+  <script>
+  (function () {
+    var data = JSON.parse(document.getElementById("agent-results").textContent);
+    var SVG = "http://www.w3.org/2000/svg";
+    function el(name, attrs) { var e = document.createElementNS(SVG, name); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+    function money(v) { return "$" + v.toFixed(v >= 0.995 ? 2 : v >= 0.01 ? 3 : 4); }
+    function tickMoney(v) { return v ? "$" + parseFloat(v.toPrecision(2)) : "$0"; }
+    function nice(max) { var p = Math.pow(10, Math.floor(Math.log10(max))), m = max / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p; }
+    // A column with a 4px rounded top, square at the baseline.
+    function column(x, y, w, h) {
+      var r = Math.min(4, h, w / 2);
+      return "M" + x + "," + (y + h) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y + "H" + (x + w - r) +
+             "Q" + (x + w) + "," + y + " " + (x + w) + "," + (y + r) + "V" + (y + h) + "Z";
+    }
+    function render(fig) {
+      var run = data.runs[+fig.dataset.run], measure = fig.dataset.measure, plot = fig.querySelector(".plot");
+      var W = plot.clientWidth, H = 210, L = 46, R = 6, T = 10, B = 26;
+      var sites = ["before", "after"].filter(function (s) { return run.sites[s]; });
+      var value = function (q) { return measure === "works" ? q.works : q.cost; };
+      var max = measure === "works" ? run.repeats : nice(Math.max.apply(null, sites.map(function (s) {
+        return Math.max.apply(null, run.sites[s].questions.map(value)); })));
+      var ticks = measure === "works" ? Array.from({ length: run.repeats + 1 }, function (_, i) { return i; })
+                                      : [0, max / 2, max];
+      var y = function (v) { return T + (H - T - B) * (1 - v / max); };
+      var svg = el("svg", { width: W, height: H, role: "img",
+        "aria-label": run.label + ": " + (measure === "works" ? "answers with working code" : "average cost per answer") + " by question, before and after. The numbers are in the table below." });
+      ticks.forEach(function (t) {
+        svg.appendChild(el("line", { x1: L, x2: W - R, y1: y(t), y2: y(t), class: t ? "grid" : "base" }));
+        var label = el("text", { x: L - 6, y: y(t) + 4, class: "tick", "text-anchor": "end" });
+        label.textContent = measure === "works" ? t : tickMoney(t);
+        svg.appendChild(label);
+      });
+      var qs = data.questions, band = (W - L - R) / qs.length, bar = Math.min(24, (band - 14) / 2);
+      qs.forEach(function (q, i) {
+        var mid = L + band * (i + 0.5);
+        var name = el("text", { x: mid, y: H - 8, class: "tick", "text-anchor": "middle" });
+        name.textContent = q.id;
+        svg.appendChild(name);
+        sites.forEach(function (s, j) {
+          var row = run.sites[s].questions.filter(function (r) { return r.id === q.id; })[0];
+          if (!row) return;
+          var x = j === 0 ? mid - 1 - bar : mid + 1, v = value(row), top = y(v);
+          if (v > 0) svg.appendChild(el("path", { d: column(x, top, bar, y(0) - top), class: "mark " + s }));
+          var hit = el("rect", { x: x - 3, y: T, width: bar + 6, height: H - T - B, class: "hit", tabindex: 0 });
+          var tip = [measure === "works" ? row.works + " of " + row.answers + " worked" : money(row.cost) + " per answer",
+                     s === "before" ? "Before" : "After", q.id + ". " + q.title];
+          hit.setAttribute("aria-label", tip.join(", "));
+          hit.addEventListener("pointerenter", function () { show(fig, tip, x + bar / 2, top); });
+          hit.addEventListener("focus", function () { show(fig, tip, x + bar / 2, top); });
+          hit.addEventListener("pointerleave", function () { hide(fig); });
+          hit.addEventListener("blur", function () { hide(fig); });
+          svg.appendChild(hit);
+        });
+      });
+      plot.replaceChildren(svg);
+    }
+    function show(fig, lines, x, y) {
+      var tip = fig.querySelector(".viz-tip") || fig.appendChild(document.createElement("div"));
+      tip.className = "viz-tip";
+      tip.replaceChildren();
+      var strong = document.createElement("strong"); strong.textContent = lines[0]; tip.appendChild(strong);
+      lines.slice(1).forEach(function (l) { var s = document.createElement("span"); s.textContent = l; tip.appendChild(s); });
+      var plot = fig.querySelector(".plot");
+      tip.style.left = Math.min(Math.max(x, 70), plot.clientWidth - 70) + "px";
+      tip.style.top = (plot.offsetTop + y - 8) + "px";
+      tip.hidden = false;
+    }
+    function hide(fig) { var tip = fig.querySelector(".viz-tip"); if (tip) tip.hidden = true; }
+    var figs = document.querySelectorAll(".results .chart");
+    figs.forEach(render);
+    if (window.ResizeObserver) {
+      var widths = new Map();
+      var ro = new ResizeObserver(function (entries) {
+        entries.forEach(function (e) {
+          var w = Math.round(e.contentRect.width);
+          if (widths.get(e.target) !== w) { widths.set(e.target, w); render(e.target.closest(".chart")); }
+        });
+      });
+      figs.forEach(function (f) { ro.observe(f.querySelector(".plot")); });
+    }
+  })();
+  </script>
+  {{ end }}
+
+  <section class="sees" id="what-the-agent-sees">
+    <h2>What the agent sees</h2>
+    <p class="note">An AI agent doesn't see the page you see. It reads the text behind it. On the left, what an agent gets from the "before" page: the HTML with the tags removed, without running scripts. On the right, the Markdown version of the "after" page, which agents can ask for. Its HTML page says the same, and that's what most agents in the tests read.</p>
+  </section>
   {{ range .Params.pairs }}
     {{ $path := cond (eq .page "_index") "" (printf "/%s" .page) }}
     {{ $b := site.GetPage (printf "/before%s" $path) }}
@@ -28,6 +218,5 @@
     </div>
   </section>
   {{ end }}
-  <p class="fine">This view shows the input. Whether a given agent then answers correctly still has to be measured by running real questions against both versions.</p>
 </main>
 {{ end }}

@@ -1,0 +1,505 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "title": "Charge €10.50"
+    },
+    {
+      "id": 2,
+      "title": "Authenticate"
+    },
+    {
+      "id": 3,
+      "title": "Charge 25 dollars"
+    },
+    {
+      "id": 4,
+      "title": "Refund half"
+    },
+    {
+      "id": 5,
+      "title": "Fetch all payments"
+    },
+    {
+      "id": 6,
+      "title": "Retry after a timeout"
+    },
+    {
+      "id": 7,
+      "title": "Verify a webhook"
+    }
+  ],
+  "runs": [
+    {
+      "model": "claude-haiku-5-5",
+      "label": "Haiku 5.5",
+      "agent": "Claude Code 2.1.306 (Claude Code)",
+      "date": "2026-10-22",
+      "repeats": 3,
+      "sites": {
+        "before": {
+          "answers": 21,
+          "works": 12,
+          "cost": 0.09993264,
+          "tokens": 814894,
+          "pages": 109,
+          "read_spec": 12,
+          "works_with_spec": 12,
+          "read_llms_txt": 0,
+          "questions": [
+            {
+              "id": 1,
+              "answers": 3,
+              "works": 1,
+              "cost": 0.0033999733333333337,
+              "tokens": 27925.0,
+              "pages": 3.6666666666666665,
+              "seconds": 20.3,
+              "read_spec": 1,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 2,
+              "answers": 3,
+              "works": 1,
+              "cost": 0.0032813566666666668,
+              "tokens": 29624.333333333332,
+              "pages": 4.0,
+              "seconds": 21.066666666666666,
+              "read_spec": 1,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 3,
+              "answers": 3,
+              "works": 0,
+              "cost": 0.005037156666666667,
+              "tokens": 41618.0,
+              "pages": 6.0,
+              "seconds": 32.93333333333334,
+              "read_spec": 0,
+              "hedged": 2,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 4,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.005103890000000001,
+              "tokens": 42466.0,
+              "pages": 5.666666666666667,
+              "seconds": 33.53333333333333,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 5,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.004671236666666668,
+              "tokens": 36290.333333333336,
+              "pages": 5.0,
+              "seconds": 26.53333333333333,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 6,
+              "answers": 3,
+              "works": 2,
+              "cost": 0.005569293333333333,
+              "tokens": 44493.0,
+              "pages": 6.0,
+              "seconds": 32.800000000000004,
+              "read_spec": 2,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 7,
+              "answers": 3,
+              "works": 2,
+              "cost": 0.006247973333333333,
+              "tokens": 49214.666666666664,
+              "pages": 6.0,
+              "seconds": 38.6,
+              "read_spec": 2,
+              "hedged": 0,
+              "read_llms_txt": 0
+            }
+          ],
+          "failures": [
+            {
+              "question": 1,
+              "kind": "old-endpoint",
+              "request": "POST /v2/charges?api_key=… → 404",
+              "why": "No such endpoint in API v3.0.0: POST /v2/charges",
+              "read_spec": false,
+              "hedged": false,
+              "answers": 2
+            },
+            {
+              "question": 2,
+              "kind": "key-in-url",
+              "request": "GET /v3/payments?api_key=… → 401",
+              "why": "No Bearer token in the Authorization header. The spec requires `Authorization: Bearer sk_...`. Query parameter `api_key` isn't in the spec.",
+              "read_spec": false,
+              "hedged": false,
+              "answers": 2
+            },
+            {
+              "question": 3,
+              "kind": "old-endpoint",
+              "request": "POST /v2/charges?api_key=… → 404",
+              "why": "No such endpoint in API v3.0.0: POST /v2/charges",
+              "read_spec": false,
+              "hedged": false,
+              "answers": 2
+            },
+            {
+              "question": 3,
+              "kind": "json-body",
+              "request": "POST /v3/payments → 415",
+              "why": "Send the request body form-encoded (application/x-www-form-urlencoded), as the spec says. This request sent application/json.",
+              "read_spec": false,
+              "hedged": true,
+              "answers": 1
+            },
+            {
+              "question": 6,
+              "kind": "old-endpoint",
+              "request": "POST /v2/charges?api_key=… → 404",
+              "why": "No such endpoint in API v3.0.0: POST /v2/charges",
+              "read_spec": false,
+              "hedged": false,
+              "answers": 1
+            },
+            {
+              "question": 7,
+              "kind": "webhook",
+              "request": null,
+              "why": "Wrong for a genuine event: rejected.",
+              "read_spec": false,
+              "hedged": false,
+              "answers": 1
+            }
+          ]
+        },
+        "after": {
+          "answers": 21,
+          "works": 21,
+          "cost": 0.07207142,
+          "tokens": 560103,
+          "pages": 70,
+          "read_spec": 3,
+          "works_with_spec": 3,
+          "read_llms_txt": 1,
+          "questions": [
+            {
+              "id": 1,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.003149096666666667,
+              "tokens": 23459.0,
+              "pages": 3.0,
+              "seconds": 15.633333333333333,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 2,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.00209245,
+              "tokens": 21850.0,
+              "pages": 2.3333333333333335,
+              "seconds": 14.366666666666667,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 3,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.0033305366666666666,
+              "tokens": 24029.333333333332,
+              "pages": 3.0,
+              "seconds": 17.099999999999998,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 4,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.0036336566666666666,
+              "tokens": 26791.333333333332,
+              "pages": 3.3333333333333335,
+              "seconds": 21.53333333333333,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 5,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.004447293333333334,
+              "tokens": 34052.666666666664,
+              "pages": 4.666666666666667,
+              "seconds": 22.766666666666666,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 1
+            },
+            {
+              "id": 6,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.0031028866666666668,
+              "tokens": 23576.666666666668,
+              "pages": 3.0,
+              "seconds": 16.0,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 7,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.0042678866666666666,
+              "tokens": 32942.0,
+              "pages": 4.0,
+              "seconds": 25.03333333333333,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            }
+          ],
+          "failures": []
+        }
+      }
+    },
+    {
+      "model": "claude-opus-5-5",
+      "label": "Opus 5.5",
+      "agent": "Claude Code 2.1.306 (Claude Code)",
+      "date": "2026-10-22",
+      "repeats": 3,
+      "sites": {
+        "before": {
+          "answers": 21,
+          "works": 20,
+          "cost": 1.4706451,
+          "tokens": 862014,
+          "pages": 154,
+          "read_spec": 21,
+          "works_with_spec": 20,
+          "read_llms_txt": 0,
+          "questions": [
+            {
+              "id": 1,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.06890356666666668,
+              "tokens": 37936.0,
+              "pages": 6.666666666666667,
+              "seconds": 34.53333333333333,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 2,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.056584133333333335,
+              "tokens": 40871.0,
+              "pages": 6.666666666666667,
+              "seconds": 32.233333333333334,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 3,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.06635533333333334,
+              "tokens": 38384.333333333336,
+              "pages": 7.333333333333333,
+              "seconds": 30.799999999999997,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 4,
+              "answers": 3,
+              "works": 2,
+              "cost": 0.06933726666666667,
+              "tokens": 39025.0,
+              "pages": 7.333333333333333,
+              "seconds": 32.46666666666667,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 5,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.0905835,
+              "tokens": 57037.666666666664,
+              "pages": 10.666666666666666,
+              "seconds": 45.36666666666667,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 6,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.07357473333333332,
+              "tokens": 41619.666666666664,
+              "pages": 7.333333333333333,
+              "seconds": 33.699999999999996,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 7,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.0648765,
+              "tokens": 32464.333333333332,
+              "pages": 5.333333333333333,
+              "seconds": 32.36666666666667,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 0
+            }
+          ],
+          "failures": [
+            {
+              "question": 4,
+              "kind": "json-body",
+              "request": "POST /v3/refunds → 415",
+              "why": "Send the request body form-encoded (application/x-www-form-urlencoded), as the spec says. This request sent application/json.",
+              "read_spec": true,
+              "hedged": false,
+              "answers": 1
+            }
+          ]
+        },
+        "after": {
+          "answers": 21,
+          "works": 21,
+          "cost": 1.0775540000000001,
+          "tokens": 564617,
+          "pages": 103,
+          "read_spec": 3,
+          "works_with_spec": 3,
+          "read_llms_txt": 4,
+          "questions": [
+            {
+              "id": 1,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.043409300000000005,
+              "tokens": 21490.666666666668,
+              "pages": 4.0,
+              "seconds": 19.266666666666666,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 2,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.034968966666666663,
+              "tokens": 20770.0,
+              "pages": 3.0,
+              "seconds": 21.066666666666666,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 1
+            },
+            {
+              "id": 3,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.04825076666666667,
+              "tokens": 23167.333333333332,
+              "pages": 5.0,
+              "seconds": 19.3,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 4,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.06070093333333334,
+              "tokens": 28270.666666666668,
+              "pages": 6.0,
+              "seconds": 26.900000000000002,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 1
+            },
+            {
+              "id": 5,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.071589,
+              "tokens": 46841.333333333336,
+              "pages": 7.666666666666667,
+              "seconds": 34.5,
+              "read_spec": 3,
+              "hedged": 0,
+              "read_llms_txt": 2
+            },
+            {
+              "id": 6,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.04508006666666666,
+              "tokens": 21975.666666666668,
+              "pages": 4.0,
+              "seconds": 24.53333333333333,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            },
+            {
+              "id": 7,
+              "answers": 3,
+              "works": 3,
+              "cost": 0.05518563333333334,
+              "tokens": 25690.0,
+              "pages": 4.666666666666667,
+              "seconds": 26.03333333333333,
+              "read_spec": 0,
+              "hedged": 0,
+              "read_llms_txt": 0
+            }
+          ],
+          "failures": []
+        }
+      }
+    }
+  ]
+}
