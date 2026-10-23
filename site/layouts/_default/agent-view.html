@@ -280,5 +280,18 @@
     </div>
   </section>
   {{ end }}
+
+  {{ $demo := "https://www.linkedin.com/in/asergaz/" }}
+  <section class="drift" id="book-a-demo">
+    <h2>Find out what agents get wrong in your docs</h2>
+    <p class="note">These tests ran on a fictional API. The same prompts, agents and checks can run on your docs, with a mock built from your API spec.</p>
+    <p class="note">In a live demo, you'll see:</p>
+    <ul class="steps">
+      <li><strong>Where agents go wrong.</strong> Which pages send them to old endpoints, and which ones they skip to read the raw spec instead.</li>
+      <li><strong>What it costs.</strong> Tokens, pages and dollars per answer, with a cheaper model and an expensive one.</li>
+      <li><strong>The docs fixed.</strong> The same prompts run again, on docs a cheaper model gets right.</li>
+    </ul>
+    <a class="cta" href="{{ $demo }}" target="_blank" rel="noopener">Book a demo →</a>
+  </section>
 </main>
 {{ end }}
