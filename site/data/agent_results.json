@@ -1,32 +1,41 @@
 {
+  "instruction": "Use only the AIKloop documentation at {docs} and the pages it links to.",
+  "code_only": "Write it in Python, using the requests library for any HTTP calls. Reply with the code only, in one code block, with no explanation.",
   "questions": [
     {
       "id": 1,
-      "title": "Charge €10.50"
+      "title": "Charge €10.50",
+      "prompt": "Write a function `charge_customer(api_key, card)` that charges a customer €10.50 with AIKloop. `card` is the ID that AIKloop.js returned for the customer's card."
     },
     {
       "id": 2,
-      "title": "Authenticate"
+      "title": "Authenticate",
+      "prompt": "Write a function `aikloop_session(api_key)` that returns a `requests.Session` set up to authenticate requests to the AIKloop API."
     },
     {
       "id": 3,
-      "title": "Charge 25 dollars"
+      "title": "Charge 25 dollars",
+      "prompt": "Write a function `charge_25_dollars(api_key, card)` that charges a customer 25 dollars with AIKloop. `card` is the ID that AIKloop.js returned for the customer's card."
     },
     {
       "id": 4,
-      "title": "Refund half"
+      "title": "Refund half",
+      "prompt": "Write a function `refund_half(api_key, payment_id, amount_paid)` that refunds half of a payment with AIKloop. `amount_paid` is what the customer paid, as a string, for example \"10.50\"."
     },
     {
       "id": 5,
-      "title": "Fetch all payments"
+      "title": "Fetch all payments",
+      "prompt": "Write a function `fetch_all_payments(api_key)` that fetches all payments from AIKloop, 100 at a time, and returns them as a list."
     },
     {
       "id": 6,
-      "title": "Retry after a timeout"
+      "title": "Retry after a timeout",
+      "prompt": "Write a function `charge_with_retry(api_key, card)` that charges a customer €10.50 with AIKloop and retries if the request times out. Use a 5-second timeout. `card` is the ID that AIKloop.js returned for the customer's card."
     },
     {
       "id": 7,
-      "title": "Verify a webhook"
+      "title": "Verify a webhook",
+      "prompt": "Write a function `verify_webhook(raw_body, headers, secret)` that verifies an AIKloop webhook. `raw_body` is the request body as bytes, `headers` holds the request's headers, and `secret` is the webhook signing secret. Return True if the webhook is genuine and False if it isn't."
     }
   ],
   "runs": [

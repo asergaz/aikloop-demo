@@ -6,60 +6,99 @@
 {{- $titles := dict -}}
 {{- range $d.questions }}{{ $titles = merge $titles (dict (string .id) .title) }}{{ end -}}
 {{- $kinds := dict
-  "old-endpoint" "Used an endpoint from the old guide that the API no longer has"
-  "key-in-url" "Put the API key in the URL, as the old guide does"
+  "old-endpoint" "Used an endpoint from the \"before\" docs that the API no longer has"
+  "key-in-url" "Put the API key in the URL, as the \"before\" docs do"
   "json-body" "Sent the fields as JSON; the API only takes them form-encoded"
-  "webhook" "Checked webhook signatures the old way: an old header and algorithm"
+  "webhook" "Checked webhook signatures the way the \"before\" docs do: a header and algorithm the API no longer uses"
   "other" "Something else went wrong" -}}
 <main class="overview wide">
   <p class="kicker">Knowledge Loop demo</p>
   <h1>{{ .Title }}</h1>
-  <p class="lead">The same AI agent, the same questions, two versions of the docs. First what the agent's code did with each version, then the text it actually reads on each page.</p>
+  <p class="lead">The same AI agent, the same prompts, two versions of the docs: <a href="{{ "before/" | relURL }}">before</a> and <a href="{{ "after/" | relURL }}">after</a>.</p>
 
   {{ with $d }}
   {{ $first := index .runs 0 }}
   <section class="results" id="results">
-    <h2>What the agents did with each version</h2>
-    <p class="note">Claude Code wrote code for seven everyday tasks, such as charging a card, refunding half a payment or verifying a webhook. Each task was asked {{ $first.repeats }} times per version, every time in a new session that could only read that version's docs. Then each answer's code ran against a mock of the API. Two models took part: Opus 5.5, and the smaller and cheaper Haiku 5.5, the kind teams often use for automated work. Run on {{ (time.AsTime $first.date).Format "2 January 2006" }}.</p>
+    <h2>What the agent did with each version</h2>
+    <p class="note">The <strong>seven prompts</strong> were coding tasks: the Claude Code agent had to write a Python script, which was then tested against a mock of the AIKloop API. The agent ran with Opus 5.5: the larger, more expensive model. And with Haiku 5.5: the cheaper model that many developers pick to keep costs down, especially for automated work.</p>
+    <p class="note">Each prompt got <strong>{{ $first.repeats }} attempts</strong> per version, in a fresh session, and every Python script was tested.</p>
 
-    <div class="models">
-      {{ range .runs }}
-      {{ $run := . }}
-      <div class="model">
-        <h3>{{ .label }}</h3>
-        <div class="scores">
-          {{ range $s := slice "before" "after" }}{{ with index $run.sites $s }}
-          <div class="score {{ cond (eq $s "before") "b" "a" }}">
-            <span class="label">{{ $s }}</span>
-            <strong>{{ .works }} of {{ .answers }}</strong><span class="what">answers with working code</span>
-            <span class="cost">Cost {{ partial "money.html" .cost }} · {{ lang.FormatNumberCustom 0 .tokens }} tokens · {{ .pages }} pages</span>
-          </div>
-          {{ end }}{{ end }}
+    {{- /* The comparison that matters: the cheapest model on the "after" docs against the most
+         expensive one on the "before" docs. */ -}}
+    {{- $cheap := index (sort .runs "sites.after.cost") 0 -}}
+    {{- $pricey := index (sort .runs "sites.before.cost" "desc") 0 -}}
+    {{- $good := $cheap.sites.after -}}{{- $bad := $pricey.sites.before -}}
+    {{- $times := div $bad.cost $good.cost -}}
+    {{- $badWrong := sub $bad.answers $bad.works -}}
+    <div class="saving">
+      <p class="hero"><strong>{{ printf (cond (ge $times 10.0) "%.0f" "%.1f") $times }}× cheaper</strong></p>
+      <p class="headline">With the "after" docs, the cheaper model got {{ if eq $good.works $good.answers }}every answer{{ else }}{{ $good.works }} of {{ $good.answers }} answers{{ end }} right.
+        With the "before" docs, even the expensive model got {{ if eq $badWrong 1 }}one answer{{ else }}{{ $badWrong }} answers{{ end }} wrong, at {{ printf (cond (ge $times 10.0) "%.0f" "%.1f") $times }} times the cost.</p>
+    <div class="versus">
+      <div class="score a">
+        <span class="label">{{ $cheap.label }} · "after" docs</span>
+        <div class="figs">
+          <div class="fig main"><strong>{{ partial "money.html" $good.cost }}</strong></div>
         </div>
-        {{ with $run.sites.before }}
-        <p class="why">
-          {{- $without := sub .answers .read_spec -}}
-          {{- if eq $without 0 -}}
-          With the old docs, every answer went to the API spec to check the guides. The code worked {{ .works }} of {{ .answers }} times, but each answer cost more and read more pages than with the updated docs.
-          {{- else -}}
-          With the old docs, answers that opened the API spec worked {{ .works_with_spec }} of {{ .read_spec }} times. Answers that trusted the guides worked {{ sub .works .works_with_spec }} of {{ $without }} times.
-          {{- end -}}
-        </p>
-        {{ end }}
+        <span class="cost">A cheaper model is enough when the docs are right.</span>
       </div>
-      {{ end }}
+    <div class="vs" aria-hidden="true">vs</div>
+      <div class="score b">
+        <span class="label">{{ $pricey.label }} · "before" docs</span>
+        <div class="figs">
+          <div class="fig main"><strong>{{ partial "money.html" $bad.cost }}</strong></div>
+        </div>
+        <span class="cost">
+          {{- if eq $bad.read_spec $bad.answers }}It went past the docs to the raw API spec. {{ end -}}
+          {{- range where $.Params.model_notes "model" $pricey.model }}{{ .note }}{{ end -}}
+        </span>
+      </div>
     </div>
+    </div>
+
+    <h3>Every combination</h3>
+    <div class="scroll">
+    <table class="combos">
+      <thead><tr><th></th><th class="b">Before</th><th class="a">After</th></tr></thead>
+      <tbody>
+      {{ range .runs }}{{ $run := . }}
+        <tr><th>{{ .label }}</th>
+        {{ range $s := slice "before" "after" }}{{ with index $run.sites $s }}
+          <td><strong>{{ .works }} of {{ .answers }}</strong> right · {{ partial "money.html" .cost }}{{ if and (eq $run.model $pricey.model) (eq $s "after") (eq .works .answers) }}*{{ end }}<span class="small">{{ lang.FormatNumberCustom 0 .tokens }} tokens · {{ .pages }} pages</span></td>
+        {{ end }}{{ end }}
+        </tr>
+      {{ end }}
+      </tbody>
+    </table>
+    </div>
+    {{ if eq $pricey.sites.after.works $pricey.sites.after.answers }}<p class="footnote">* {{ $pricey.label | strings.TrimSuffix " 5.5" }} is more expensive, but you don't need it when the docs are right.</p>{{ end }}
 
     <div class="viz-legend" aria-hidden="true"><span class="key b"></span>Before <span class="key a"></span>After</div>
-    <h3 class="viz-title">Answers with working code, by question</h3>
+    <h3 class="viz-title">Answers with working code, by prompt</h3>
     <div class="multiples">
-      {{ range $i, $run := .runs }}<figure class="chart" data-run="{{ $i }}" data-measure="works"><figcaption>{{ $run.label }}</figcaption><div class="plot"></div></figure>{{ end }}
+      {{ range $i, $run := .runs }}<figure class="chart" data-run="{{ $i }}" data-measure="works"><figcaption>{{ $run.label }}</figcaption><div class="plot"></div>
+        {{- with $run.sites.before }}
+        <p class="chart-note">"Before" docs:
+          {{- if lt .read_spec .answers }} {{ .works_with_spec }} of {{ .read_spec }} right when it checked the spec, {{ sub .works .works_with_spec }} of {{ sub .answers .read_spec }} when it trusted the docs.
+          {{- else }} it checked the spec every time.{{ end }}
+          {{- range where $.Params.model_notes "model" $run.model }}{{ with .chart }} {{ . }}{{ end }}{{ end }}</p>
+        {{- end }}</figure>{{ end }}
     </div>
-    <h3 class="viz-title">Cost per answer, by question (average)</h3>
-    <div class="multiples">
-      {{ range $i, $run := .runs }}<figure class="chart" data-run="{{ $i }}" data-measure="cost"><figcaption>{{ $run.label }}</figcaption><div class="plot"></div></figure>{{ end }}
-    </div>
-    <p class="qkey">{{ range $i, $q := .questions }}{{ if $i }} · {{ end }}<b>{{ $q.id }}</b> {{ $q.title }}{{ end }}</p>
+    <p class="qkey narrow-only">{{ range $i, $q := .questions }}{{ if $i }} · {{ end }}<b>{{ $q.id }}</b> {{ $q.title }}{{ end }}</p>
+
+    {{ with .instruction }}
+    <details class="prompts">
+      <summary>The seven prompts, as the agent got them</summary>
+      <p>Each prompt had three parts: the same first line, one of the seven tasks, and the same last line.</p>
+      {{- $before := "before/" | absURL -}}{{- $after := "after/" | absURL }}
+      <blockquote class="prompt">{{ replace . "{docs}" (printf "<a href=\"%s\">%s</a> (or <a href=\"%s\">%s</a>)" $before $before $after $after) | safeHTML }}</blockquote>
+      <ol>
+        {{ range $d.questions }}<li><span class="title">{{ .title }}</span><blockquote class="prompt">{{ replaceRE "`([^`]+)`" "<code>$1</code>" (.prompt | htmlEscape) | safeHTML }}</blockquote></li>{{ end }}
+      </ol>
+      <blockquote class="prompt">{{ $d.code_only }}</blockquote>
+      <p>Each prompt went to a new Claude Code session, in an empty folder, that could only fetch pages from the docs site.</p>
+    </details>
+    {{ end }}
 
     <h3>What went wrong</h3>
     <div class="scroll">
@@ -70,9 +109,10 @@
         <tr>
           <td>{{ $run.label }}, {{ $s }}</td>
           <td>{{ .question }}. {{ index $titles (string .question) }}<span class="times">{{ .answers }} of {{ $run.repeats }} answers</span></td>
-          <td>{{ index $kinds .kind }}</td>
-          <td>{{ with .request }}<code>{{ . }}</code>{{ else }}–{{ end }}</td>
-          <td>{{ if eq .kind "webhook" }}Rejected a genuine webhook event.{{ else }}{{ .why | markdownify }}{{ end }}</td>
+          <td>{{ index $kinds .kind }}{{ $q := .question }}{{ range where (where $.Params.failure_notes "model" $run.model) "question" $q }}<span class="why-note">{{ .note }}</span>{{ end }}</td>
+          {{- /* A webhook check makes no request: the test hands the code events signed as the spec says. */}}
+          <td>{{ with .request }}<code>{{ . }}</code>{{ else }}{{ if eq .kind "webhook" }}A genuine webhook event, signed as the spec says{{ else }}–{{ end }}{{ end }}</td>
+          <td>{{ if eq .kind "webhook" }}No API call: the code rejected the event.{{ else }}{{ .why | markdownify }}{{ end }}</td>
         </tr>
       {{ end }}{{ end }}{{ end }}
       </tbody>
@@ -120,9 +160,22 @@
       return "M" + x + "," + (y + h) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y + "H" + (x + w - r) +
              "Q" + (x + w) + "," + y + " " + (x + w) + "," + (y + r) + "V" + (y + h) + "Z";
     }
+    // Words into lines of at most n characters (a longer word gets a line of its own).
+    function wrap(text, n) {
+      return text.split(" ").reduce(function (out, word) {
+        var last = out[out.length - 1];
+        if (last && (last + " " + word).length <= n) out[out.length - 1] = last + " " + word; else out.push(word);
+        return out;
+      }, []);
+    }
     function render(fig) {
       var run = data.runs[+fig.dataset.run], measure = fig.dataset.measure, plot = fig.querySelector(".plot");
-      var W = plot.clientWidth, H = 210, L = 46, R = 6, T = 10, B = 26;
+      var qs = data.questions, W = plot.clientWidth, L = 62, R = 6, T = 10;
+      // Under each group of bars: "1. Charge €10.50", wrapped to fit, or just "1" when the chart is too narrow.
+      var band = (W - L - R) / qs.length, named = band >= 70, perLine = Math.floor(band / 6.3);
+      var labels = qs.map(function (q) { return named ? wrap(q.id + ". " + q.title, perLine) : [String(q.id)]; });
+      var lines = Math.max.apply(null, labels.map(function (l) { return l.length; }));
+      var B = 16 + 13 * lines, H = 186 + B;
       var sites = ["before", "after"].filter(function (s) { return run.sites[s]; });
       var value = function (q) { return measure === "works" ? q.works : q.cost; };
       var max = measure === "works" ? run.repeats : nice(Math.max.apply(null, sites.map(function (s) {
@@ -138,11 +191,15 @@
         label.textContent = measure === "works" ? t : tickMoney(t);
         svg.appendChild(label);
       });
-      var qs = data.questions, band = (W - L - R) / qs.length, bar = Math.min(24, (band - 14) / 2);
+      var bar = Math.min(24, (band - 14) / 2);
       qs.forEach(function (q, i) {
         var mid = L + band * (i + 0.5);
-        var name = el("text", { x: mid, y: H - 8, class: "tick", "text-anchor": "middle" });
-        name.textContent = q.id;
+        var name = el("text", { x: mid, y: H - B + 16, class: "tick", "text-anchor": "middle" });
+        labels[i].forEach(function (line, k) {
+          var span = el("tspan", { x: mid, dy: k ? 13 : 0 });
+          span.textContent = line;
+          name.appendChild(span);
+        });
         svg.appendChild(name);
         sites.forEach(function (s, j) {
           var row = run.sites[s].questions.filter(function (r) { return r.id === q.id; })[0];
@@ -160,6 +217,11 @@
           svg.appendChild(hit);
         });
       });
+      // The vertical axis title; the labels under the bars name each prompt.
+      var midY = T + (H - T - B) / 2;
+      var yTitle = el("text", { x: 12, y: midY, class: "axis-title", "text-anchor": "middle", transform: "rotate(-90 12 " + midY + ")" });
+      yTitle.textContent = measure === "works" ? "Attempts" : "Average cost per answer";
+      svg.appendChild(yTitle);
       plot.replaceChildren(svg);
     }
     function show(fig, lines, x, y) {
@@ -192,7 +254,7 @@
 
   <section class="sees" id="what-the-agent-sees">
     <h2>What the agent sees</h2>
-    <p class="note">An AI agent doesn't see the page you see. It reads the text behind it. On the left, what an agent gets from the "before" page: the HTML with the tags removed, without running scripts. On the right, the Markdown version of the "after" page, which agents can ask for. Its HTML page says the same, and that's what most agents in the tests read.</p>
+    <p class="note">An AI agent doesn't see the page you see. It reads the text behind it. On the left, what an agent gets from the "before" page: the HTML with the tags removed, without running scripts. On the right, the Markdown version of the "after" page, which agents can ask for.</p>
   </section>
   {{ range .Params.pairs }}
     {{ $path := cond (eq .page "_index") "" (printf "/%s" .page) }}

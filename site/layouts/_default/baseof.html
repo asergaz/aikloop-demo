@@ -4,7 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{{ .Title }}{{ if not .IsHome }} · AIKloop docs{{ end }}</title>
-  <link rel="stylesheet" href="{{ "css/docs.css" | relURL }}">
+  {{- /* The ?v= changes whenever the stylesheet does, so browsers don't keep using an old copy. */}}
+  <link rel="stylesheet" href="{{ "css/docs.css" | relURL }}?v={{ os.ReadFile "static/css/docs.css" | md5 | truncate 8 "" }}">
   {{ with .OutputFormats.Get "markdown" }}<link rel="alternate" type="text/markdown" href="{{ .RelPermalink }}">{{ end }}
 </head>
 <body class="{{ block "bodyclass" . }}{{ end }}">
