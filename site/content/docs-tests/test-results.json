@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-21",
+  "generated": "2026-10-23",
   "current": {
     "version": "3.0.0",
     "file": "openapi-3.0.0.json",
@@ -264,7 +264,7 @@
               "version": "3.0.0",
               "spec": "openapi-3.0.0.json",
               "status": "pass",
-              "detail": "Sent the sample twice with the same key: one payment (pay_1000); the second call returned the same payment instead of a new one. A retry a minute before the 24 hours the page gives are up returned it too.",
+              "detail": "Sent the sample twice with the same key: one payment (pay_1000); the second call returned the same payment instead of a new one. A retry 23 hours and 59 minutes later, still within the 24 hours the page gives, returned it too.",
               "evidence": null
             },
             {
@@ -272,7 +272,7 @@
               "version": "3.1.0",
               "spec": "incoming/openapi-3.1.0.json",
               "status": "fail",
-              "detail": "Says keys are kept for 24 hours, but the spec keeps them for 1 hour. Retrying a minute before the 24 hours are up created a second payment: the customer is charged twice.",
+              "detail": "Says keys are kept for 24 hours, but the spec keeps them for 1 hour. A retry 23 hours and 59 minutes later created a second payment: the customer is charged twice.",
               "evidence": {
                 "text": "If a request times out, retry it **with the same `Idempotency-Key`**. AIKloop returns the original result instead of creating a second payment. Keys are kept for 24 hours.",
                 "line": 27

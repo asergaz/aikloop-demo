@@ -4,7 +4,7 @@
 <main class="overview wide">
   <p class="kicker">Knowledge Loop demo</p>
   <h1>Docs tests</h1>
-  <p class="lead">Every page of the docs gives guidance you can check: this endpoint exists, this sample works, retrying is safe. These tests check that guidance against the OpenAPI spec and against a mock of the API built from it. When the next release's spec arrives, the same tests show the docs team what it breaks, before it ships.</p>
+  <p class="lead">Docs make promises: this endpoint exists, this sample works, retrying is safe. These tests check every one against the API's spec and run every sample against a mock of the API. When the next release arrives, they show what it breaks, before your customers do.</p>
   {{ with $r }}
   {{ $runs := slice (dict "key" "current" "label" "Current release" "class" "a" "run" .current) }}
   {{ with .incoming }}{{ $runs = $runs | append (dict "key" "incoming" "label" "Incoming release" "class" "b" "run" .) }}{{ end }}
@@ -44,7 +44,7 @@
         <tr><td>Authentication matches the spec</td><td>Samples send a Bearer token in the <code>Authorization</code> header, never <code>?api_key=</code> in the URL.</td></tr>
         <tr><td>Parameters and headers match the spec</td><td>Every field and query parameter is in the spec, required ones are there, values have the right type and are within limits, and required headers such as <code>Idempotency-Key</code> are sent.</td></tr>
         <tr><td>Sample runs against the mock API</td><td>The sample, run as written, gets a successful response from the mock.</td></tr>
-        <tr><td>Retrying after a timeout is safe</td><td>The page tells you to retry with the same <code>Idempotency-Key</code>, and sending its sample twice creates one payment, not two. If the page says how long keys are kept, the mock retries again a minute before that time is up, with keys expiring when the spec says, and it must still be one payment.</td></tr>
+        <tr><td>Retrying after a timeout is safe</td><td>The page says to retry with the same <code>Idempotency-Key</code>, and sending its sample twice creates one payment, not two. If the page says how long keys are kept, a retry just before that time ends must still create only one payment.</td></tr>
         <tr><td>Signature header and rules match the spec</td><td>The webhooks page names the header, the algorithm and the time window that the spec gives.</td></tr>
         <tr><td>Latest release matches the spec</td><td>The changelog's latest entry is the version in the spec.</td></tr>
       </tbody>
@@ -54,7 +54,7 @@
   {{ $demo := "https://www.linkedin.com/in/asergaz/" }}
   <section class="drift">
     <h2>See it catch the next release</h2>
-    <p class="note">The table above shows the docs as they are today{{ with .incoming }}, and what the unreleased v{{ .version }} breaks in them{{ end }}. The interesting part happens before the release ships: the unreleased spec is tested privately against the same docs, Claude drafts the fixes as a pull request, and a human reviews them. The release ships with its docs already right.</p>
+    <p class="note">The table above shows the docs as they are today{{ with .incoming }}, and what the unreleased {{ $name := path.Base .file }}{{ $url := printf "specs/%s" $name | relURL }}{{ with $.Resources.Get $name }}{{ $url = .RelPermalink }}{{ end }}<a href="{{ $url }}" target="_blank" rel="noopener">v{{ .version }}</a> breaks{{ end }}. The interesting part happens before the release ships: the unreleased spec is tested privately against the same docs, Claude drafts the fixes as a pull request, and a human reviews them.</p>
     <p class="note">In a live demo, you'll see:</p>
     <ul class="steps">
       <li><strong>What the next release breaks.</strong> Which pages, which lines and why, before any customer reads them.</li>
