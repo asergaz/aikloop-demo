@@ -1,0 +1,9 @@
+{{ define "main" }}
+<div class="docs">
+  {{ partial "sidebar.html" . }}
+  <main class="doc">
+    {{ with .Params.fragment }}{{ (resources.Get .).Content | safeHTML }}{{ else }}{{ .Content }}{{ end }}
+  </main>
+  <nav class="toc"></nav>
+</div>
+{{ end }}

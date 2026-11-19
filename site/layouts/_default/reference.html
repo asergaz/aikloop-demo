@@ -1,0 +1,11 @@
+{{ define "main" }}
+<div class="docs">
+  {{ partial "sidebar.html" . }}
+  <main class="doc">
+    <h1>{{ .Title }}</h1>
+    {{ if eq .Params.version "after" }}{{ with .OutputFormats.Get "markdown" }}<p class="md-link"><a href="{{ .RelPermalink }}">View as Markdown</a></p>{{ end }}{{ end }}
+    {{ partial "body.html" . }}
+  </main>
+  <nav class="toc"></nav>
+</div>
+{{ end }}

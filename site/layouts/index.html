@@ -1,0 +1,40 @@
+{{ define "bodyclass" }}demo-home{{ end }}
+{{ define "main" }}
+<main class="overview">
+  <h1>Same docs, two versions</h1>
+  <p class="lead">AIKloop Payments is a fictional API. Its docs exist in two versions. Both look fine to a human. The difference is what an AI agent can get out of them.</p>
+  {{- $res := dict }}{{ with site.GetPage "/agent-view" }}{{ with .Resources.Get "agent-results.json" }}{{ $res = . | transform.Unmarshal }}{{ end }}{{ end }}
+  {{- $cheap := index (sort $res.runs "sites.after.cost") 0 }}
+  {{- $pricey := index (sort $res.runs "sites.before.cost" "desc") 0 }}
+  {{- $times := div $pricey.sites.before.cost $cheap.sites.after.cost }}
+  {{- $good := $cheap.sites.after }}{{ $bad := $pricey.sites.before }}{{ $badWrong := sub $bad.answers $bad.works }}
+  <div class="deal">
+  <p class="deal-hero">{{ printf (cond (ge $times 10.0) "%.0f" "%.1f") $times }}× lower cost</p>
+  <p class="deal-sub">Same prompts. The stale docs needed the expensive model{{ if gt $badWrong 0 }}, and it still got {{ if eq $badWrong 1 }}one answer{{ else }}{{ $badWrong }} answers{{ end }} wrong{{ end }}.</p>
+  <div class="choices">
+    <a class="choice b" href="{{ "before/" | relURL }}" target="_blank" rel="noopener">
+      <span class="label">Before</span>
+      <strong>Stale docs</strong>
+      <span class="price">{{ partial "money.html" $bad.cost }}</span>
+      <span class="who">Claude {{ $pricey.label }} · expensive model · {{ if eq $badWrong 0 }}all answers correct{{ else }}{{ $badWrong }} {{ cond (eq $badWrong 1) "answer" "answers" }} wrong{{ end }}</span>
+      <span class="what">The API reference shows v3, but the docs still use the old endpoints and nothing says they're out of date. The reference is drawn by JavaScript, and there's no Markdown or llms.txt.</span>
+      <span class="open">Before docs ↗</span>
+    </a>
+    <p class="vs" aria-hidden="true">vs</p>
+    <a class="choice a" href="{{ "after/" | relURL }}" target="_blank" rel="noopener">
+      <span class="label">After</span>
+      <strong>After a Knowledge Loop Assessment</strong>
+      <span class="price">{{ partial "money.html" $good.cost }}</span>
+      <span class="who">Claude {{ $cheap.label }} · cheaper model · {{ if eq $good.works $good.answers }}all answers correct{{ else }}{{ $good.works }} of {{ $good.answers }} answers correct{{ end }}</span>
+      <span class="what">The docs are updated for v3, with a changelog. Every page has a Markdown version, the API reference is generated when the site is built, and llms.txt tells agents which version is current.</span>
+      <span class="open">After docs ↗</span>
+    </a>
+  </div>
+  </div>
+  <div class="next">
+    <a class="cta" href="{{ "agent-view/" | relURL }}">What the agent sees →</a>
+    <a class="cta ghost" href="{{ "docs-tests/" | relURL }}">How docs tests work →</a>
+  </div>
+  <p class="fine">Both versions use the same layout and table of contents, and both API references come from the same API spec. The difference is the content and what an agent can read. Domains end in .example, a reserved ending that can never point to a real site.</p>
+</main>
+{{ end }}

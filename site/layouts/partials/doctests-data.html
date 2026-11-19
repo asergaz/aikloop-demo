@@ -1,0 +1,5 @@
+{{- $r := false -}}
+{{- with site.GetPage "/docs-tests" -}}
+  {{- with .Resources.Get "docs-tests-results.json" -}}{{- $r = . | transform.Unmarshal -}}{{- end -}}
+{{- end -}}
+{{- return $r -}}

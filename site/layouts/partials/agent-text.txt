@@ -1,0 +1,7 @@
+{{- $content := .Content -}}
+{{- with .Params.fragment }}{{ $content = (resources.Get .).Content }}{{ end -}}
+{{- $html := printf "%s%s" (partial "sidebar.html" .) $content -}}
+{{- $t := $html | plainify | htmlUnescape -}}
+{{- $t = replaceRE `[ \t]+` " " $t -}}
+{{- $t = replaceRE `\s*\n\s*` "\n" $t -}}
+{{- trim $t " \n" -}}

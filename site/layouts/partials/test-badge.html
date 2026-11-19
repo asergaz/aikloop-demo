@@ -1,0 +1,6 @@
+{{- $slug := .File.ContentBaseName -}}
+{{- with partialCached "doctests-data.html" . "doctests" -}}
+  {{- $version := .current.version -}}
+  {{- $date := .generated -}}
+  {{- with index .current.summary $slug }} <span class="tested{{ if ne .pass .total }} failing{{ end }}">{{ if eq .pass .total }}✓ Tested with v{{ $version }}{{ else }}✗ Fails with v{{ $version }}{{ end }} · {{ $date }}</span>{{ end -}}
+{{- end -}}

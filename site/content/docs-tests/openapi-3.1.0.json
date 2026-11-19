@@ -1,0 +1,151 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AIKloop Payments API (fictional demo)",
+    "version": "3.1.0",
+    "description": "Send your secret key as a Bearer token in the Authorization header: Authorization: Bearer sk_live_... (or sk_test_... in test mode)."
+  },
+  "servers": [
+    { "url": "https://api.aikloop.example/v3" }
+  ],
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "tags": [
+    { "name": "Payments" },
+    { "name": "Refunds" },
+    { "name": "Webhooks" }
+  ],
+  "paths": {
+    "/payments": {
+      "post": {
+        "tags": ["Payments"],
+        "summary": "Create a payment.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "description": "Required. A unique value, such as a UUID v4. Retry a failed request with the same key. Keys are kept for 1 hour.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": ["amount_minor", "currency", "payment_method"],
+                "properties": {
+                  "amount_minor": {
+                    "type": "integer",
+                    "description": "Required. Amount in the currency's minor unit, for example 1050 for 10.50 EUR."
+                  },
+                  "currency": {
+                    "type": "string",
+                    "description": "Required. Three-letter ISO code, lowercase. No default."
+                  },
+                  "payment_method": {
+                    "type": "string",
+                    "description": "Required. Payment method ID from AIKloop.js, for example pm_123."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "The payment was created." }
+        }
+      },
+      "get": {
+        "tags": ["Payments"],
+        "summary": "List payments, newest first.",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "description": "1 to 50. Default 10.",
+            "schema": { "type": "integer", "minimum": 1, "maximum": 50 }
+          },
+          {
+            "name": "starting_after",
+            "in": "query",
+            "required": false,
+            "description": "ID of the last object from the previous page.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "A page of payments." }
+        }
+      }
+    },
+    "/refunds": {
+      "post": {
+        "tags": ["Refunds"],
+        "summary": "Refund all or part of a payment.",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "description": "Required.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "type": "object",
+                "required": ["payment_id"],
+                "properties": {
+                  "payment_id": {
+                    "type": "string",
+                    "description": "Required. The payment to refund, for example pay_123."
+                  },
+                  "amount_minor": {
+                    "type": "integer",
+                    "description": "Optional. Partial refund amount in minor units. Leave it out to refund the full amount."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "The refund was created." }
+        }
+      }
+    }
+  },
+  "webhooks": {
+    "Webhook request": {
+      "post": {
+        "tags": ["Webhooks"],
+        "summary": "Every webhook request is signed.",
+        "parameters": [
+          {
+            "name": "AIKloop-Signature",
+            "in": "header",
+            "required": true,
+            "description": "t=<timestamp>,v1=<signature>. t is the Unix timestamp: reject events older than 3 minutes. v1 is the HMAC-SHA256 of \"{t}.{raw_body}\" with your whsec_ signing secret: compare it in constant time.",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Return 200 to acknowledge the event." }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer" }
+    }
+  }
+}

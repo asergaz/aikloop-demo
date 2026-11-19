@@ -1,0 +1,320 @@
+{{ define "bodyclass" }}agent-view{{ end }}
+{{ define "main" }}
+{{- $d := dict -}}
+{{- with .Resources.Get "agent-results.json" }}{{ $d = . | transform.Unmarshal }}{{ end -}}
+{{- $titles := dict -}}
+{{- range $d.questions }}{{ $titles = merge $titles (dict (string .id) .title) }}{{ end -}}
+{{- $link := `<a href="%s" target="_blank" rel="noopener">%s</a>` -}}
+{{- $kinds := dict
+  "old-endpoint" (printf "Used an endpoint from %s that the API no longer has" (printf $link ("before/accept-a-payment/" | relURL) "Accept a payment"))
+  "key-in-url" (printf "Put the API key in the URL, as %s does" (printf $link ("before/getting-started/" | relURL) "Getting started"))
+  "json-body" "Sent the fields as JSON; the API only takes them form-encoded"
+  "webhook" (printf "Checked webhook signatures the way %s does: a header and algorithm the API no longer uses" (printf $link ("before/webhooks/" | relURL) "Handle webhooks"))
+  "other" "Something else went wrong" -}}
+<main class="overview wide">
+  <h1>{{ .Title }}</h1>
+
+  {{ with $d }}
+  {{ $first := index .runs 0 }}
+  {{- $cheap := index (sort .runs "sites.after.cost") 0 -}}
+  {{- $pricey := index (sort .runs "sites.before.cost" "desc") 0 -}}
+  {{- $good := $cheap.sites.after -}}{{- $bad := $pricey.sites.before -}}
+  {{- $times := div $bad.cost $good.cost -}}
+  {{- $badWrong := sub $bad.answers $bad.works -}}
+  <p class="lead">After the Knowledge Loop Assessment, the cheaper model got {{ if eq $good.works $good.answers }}every answer{{ else }}{{ $good.works }} of {{ $good.answers }} answers{{ end }} right.
+    With the stale docs, {{ if eq $badWrong 0 }}only the expensive model got every answer right{{ else }}even the expensive model got {{ if eq $badWrong 1 }}one answer{{ else }}{{ $badWrong }} answers{{ end }} wrong{{ end }}, at {{ printf (cond (ge $times 10.0) "%.0f" "%.1f") $times }}× the cost.</p>
+
+  <section class="results" id="results">
+    <div class="saving">
+      <p class="hero"><strong>{{ printf (cond (ge $times 10.0) "%.0f" "%.1f") $times }}× lower cost</strong></p>
+    <div class="versus">
+      <div class="score b">
+        <span class="label"><span class="model m-{{ index (split $pricey.model "-") 1 }}">Claude {{ $pricey.label }}</span> · Before docs</span>
+        <div class="figs">
+          <div class="fig main"><strong>{{ partial "money.html" $bad.cost }}</strong></div>
+        </div>
+        <span class="cost">
+          {{- if eq $bad.read_spec $bad.answers }}It went past the docs to the raw API spec. {{ end -}}
+          {{- range where ($.Params.model_notes | default slice) "model" $pricey.model }}{{ .note }}{{ end -}}
+        </span>
+      </div>
+    <div class="vs" aria-hidden="true">vs</div>
+      <div class="score a">
+        <span class="label"><span class="model m-{{ index (split $cheap.model "-") 1 }}">Claude {{ $cheap.label }}</span> · After docs</span>
+        <div class="figs">
+          <div class="fig main"><strong>{{ partial "money.html" $good.cost }}</strong></div>
+        </div>
+        <span class="cost">A cheaper model is enough when the docs are right.</span>
+      </div>
+    </div>
+    </div>
+
+    <h2>What the agent did with each version</h2>
+    <p class="note"><strong>Seven prompts</strong> were sent to Claude Code, each with a different coding task. The agent had to read the docs, write a script, and run it against a mock API. The table below shows how many of the <strong>{{ $first.repeats }} attempts</strong> worked, and what they cost.</p>
+    <h3>Every combination</h3>
+    <div class="scroll">
+    <table class="combos">
+      <thead><tr><th></th><th class="b">Before</th><th class="a">After</th></tr></thead>
+      <tbody>
+      {{ range .runs }}{{ $run := . }}
+        <tr><th><span class="model m-{{ index (split .model "-") 1 }}">{{ .label }}</span><span class="small">{{ cond (eq .model $pricey.model) "the expensive model" "the cheaper model" }}</span></th>
+        {{ range $s := slice "before" "after" }}{{ with index $run.sites $s }}
+          <td><strong>{{ .works }} of {{ .answers }}</strong> right · {{ partial "money.html" .cost }}{{ if and (eq $run.model $pricey.model) (eq $s "after") (eq .works .answers) }}*{{ end }}<span class="small">{{ lang.FormatNumberCustom 0 .tokens }} tokens · {{ .pages }} pages</span></td>
+        {{ end }}{{ end }}
+        </tr>
+      {{ end }}
+      </tbody>
+    </table>
+    </div>
+    {{ if eq $pricey.sites.after.works $pricey.sites.after.answers }}<p class="footnote">* {{ $pricey.label }} is more expensive, but you don't need it when the docs are right.</p>{{ end }}
+
+    <div class="viz-legend" aria-hidden="true"><span class="key b"></span>Before <span class="key a"></span>After</div>
+    <h3 class="viz-title">Answers with working code, by prompt</h3>
+    <div class="multiples">
+      {{ range $i, $run := .runs }}<figure class="chart" data-run="{{ $i }}" data-measure="works"><figcaption><span class="model m-{{ index (split $run.model "-") 1 }}">{{ $run.label }}</span></figcaption><div class="plot"></div>
+        {{- with $run.sites.before }}
+        <p class="chart-note">
+          {{- with $run.sites.after }}With the <strong class="v-a">After</strong> docs, {{ if eq .works .answers }}every answer was right{{ else }}{{ .works }} of {{ .answers }} answers were right{{ end }}. {{ end -}}
+          With the <strong class="v-b">Before</strong> docs,
+          {{- if lt .read_spec .answers }} it got {{ .works_with_spec }} of {{ .read_spec }} right when it checked the spec, and {{ sub .works .works_with_spec }} of {{ sub .answers .read_spec }} when it trusted the docs.
+          {{- else }} it checked the spec every time.{{ end }}
+          {{- range where ($.Params.model_notes | default slice) "model" $run.model }}{{ with .chart }} {{ . }}{{ end }}{{ end }}</p>
+        {{- end }}</figure>{{ end }}
+    </div>
+    <p class="qkey narrow-only">{{ range $i, $q := .questions }}{{ if $i }} · {{ end }}<b>{{ $q.id }}</b> {{ $q.title }}{{ end }}</p>
+
+    {{ with .instruction }}
+    <details class="prompts">
+      <summary>The seven prompts, as the agent got them</summary>
+      <p>Each prompt had three parts: the same first paragraph, one of the seven tasks, and the same last paragraph.</p>
+      {{- $before := "before/" | absURL -}}{{- $after := "after/" | absURL }}
+      <blockquote class="prompt">{{ replace . "{docs}" (printf "<a href=\"%s\">%s</a> (or <a href=\"%s\">%s</a>)" $before $before $after $after) | safeHTML }}</blockquote>
+      <ol>
+        {{ range $d.questions }}<li><span class="title">{{ .title }}</span><blockquote class="prompt">{{ replaceRE "`([^`]+)`" "<code>$1</code>" (.prompt | htmlEscape) | safeHTML }}</blockquote></li>{{ end }}
+      </ol>
+      <blockquote class="prompt">{{ $d.code_only }}</blockquote>
+      <p>Each prompt went to a new Claude Code session, in an empty folder, that could only fetch pages from the docs site.</p>
+    </details>
+    {{ end }}
+
+    <h3>What went wrong</h3>
+    {{- range sort .runs "sites.before.cost" "desc" }}{{ $run := . }}
+    {{- range $s, $site := .sites }}{{ with $site.failures }}{{ $all := . }}
+    <h4 class="failures-head"><span class="model m-{{ index (split $run.model "-") 1 }}">{{ $run.label }}</span>{{ if eq $s "after" }} · <strong class="v-a">After</strong> docs{{ end }}</h4>
+    <div class="scroll">
+    <table class="failures">
+      <thead><tr><th>Question</th><th>What the code did</th><th>The request</th><th>API response</th></tr></thead>
+      <tbody>
+        {{- range $all }}
+        {{- $main := index (sort (where $all "question" .question) "answers" "desc") 0 }}
+        {{- if eq (printf "%v|%v|%v" .kind .request .why) (printf "%v|%v|%v" $main.kind $main.request $main.why) }}
+        <tr>
+          <td data-label="Question">{{ .question }}. {{ index $titles (string .question) }}</td>
+          <td data-label="What the code did">{{ index $kinds .kind | safeHTML }}
+            {{- $q := .question }}{{ range where (where ($.Params.failure_notes | default slice) "model" $run.model) "question" $q }}<div class="why-note">{{ printf "**Why?** %s" .note | $.Page.RenderString (dict "display" "block") }}</div>{{ end }}</td>
+          <td data-label="The request">{{ with .request }}<code>{{ . }}</code>{{ else }}{{ if eq .kind "webhook" }}A genuine webhook event, signed as the spec says{{ else }}–{{ end }}{{ end }}</td>
+          <td data-label="API response">{{ if eq .kind "webhook" }}No API call: the code rejected the event.{{ else }}{{ .why | markdownify }}{{ end }}</td>
+        </tr>
+        {{- end }}
+        {{- end }}
+      </tbody>
+    </table>
+    </div>
+    {{- end }}{{ end }}
+    {{- end }}
+
+    <details class="numbers" id="all-the-numbers">
+      <summary>All the numbers</summary>
+      {{ range .runs }}{{ $run := . }}
+      <h4><span class="model m-{{ index (split .model "-") 1 }}">{{ .label }}</span></h4>
+      <div class="scroll">
+      <table class="by-question">
+        <thead>
+          <tr><th rowspan="2">Question</th>{{ range $s := slice "before" "after" }}<th colspan="{{ cond (eq $s "after") 7 6 }}" class="{{ cond (eq $s "before") "b" "a split" }}">{{ $s }}</th>{{ end }}</tr>
+          <tr>{{ range $s := slice "before" "after" }}<th{{ if eq $s "after" }} class="split"{{ end }}>works</th><th>cost <span class="avg">(average)</span></th><th>tokens <span class="avg">(average)</span></th><th>pages <span class="avg">(average)</span></th><th>seconds <span class="avg">(average)</span></th><th>read spec</th>{{ if eq $s "after" }}<th>read llms.txt</th>{{ end }}{{ end }}</tr>
+        </thead>
+        <tbody>
+        {{ range $q := $d.questions }}
+          <tr><th>{{ $q.id }}. {{ $q.title }}</th>
+          {{ range $s := slice "before" "after" }}{{ with index $run.sites $s }}{{ range .questions }}{{ if eq .id $q.id }}
+            <td{{ if eq $s "after" }} class="split"{{ end }}>{{ .works }} of {{ .answers }}</td><td>{{ partial "money.html" .cost }}</td><td>{{ lang.FormatNumberCustom 0 .tokens }}</td><td>{{ math.Round .pages }}</td><td>{{ math.Round .seconds }}</td><td>{{ .read_spec }} of {{ .answers }}</td>{{ if eq $s "after" }}<td>{{ .read_llms_txt }} of {{ .answers }}</td>{{ end }}
+          {{ end }}{{ end }}{{ end }}{{ end }}
+          </tr>
+        {{ end }}
+        </tbody>
+      </table>
+      </div>
+      {{ end }}
+    </details>
+
+    <p class="fine">Cost is at API list prices, as Claude Code reports it. Tokens count every model in a session, including the small model Claude Code uses to read each page for the agent. These results come from one agent tool, on a fictional API whose docs were written for this demo, with {{ $first.repeats }} answers per question: they show what can happen, not a benchmark.</p>
+  </section>
+  <script type="application/json" id="agent-results">{{ $d | jsonify | safeJS }}</script>
+  <script>
+  (function () {
+    var data = JSON.parse(document.getElementById("agent-results").textContent);
+    var SVG = "http://www.w3.org/2000/svg";
+    function el(name, attrs) { var e = document.createElementNS(SVG, name); for (var k in attrs) e.setAttribute(k, attrs[k]); return e; }
+    function money(v) { return "$" + v.toFixed(v >= 0.995 ? 2 : v >= 0.01 ? 3 : 4); }
+    function tickMoney(v) { return v ? "$" + parseFloat(v.toPrecision(2)) : "$0"; }
+    function nice(max) { var p = Math.pow(10, Math.floor(Math.log10(max))), m = max / p; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 2.5 ? 2.5 : m <= 5 ? 5 : 10) * p; }
+    function column(x, y, w, h) {
+      var r = Math.min(4, h, w / 2);
+      return "M" + x + "," + (y + h) + "V" + (y + r) + "Q" + x + "," + y + " " + (x + r) + "," + y + "H" + (x + w - r) +
+             "Q" + (x + w) + "," + y + " " + (x + w) + "," + (y + r) + "V" + (y + h) + "Z";
+    }
+    function wrap(text, n) {
+      return text.split(" ").reduce(function (out, word) {
+        var last = out[out.length - 1];
+        if (last && (last + " " + word).length <= n) out[out.length - 1] = last + " " + word; else out.push(word);
+        return out;
+      }, []);
+    }
+    function render(fig) {
+      var run = data.runs[+fig.dataset.run], measure = fig.dataset.measure, plot = fig.querySelector(".plot");
+      var qs = data.questions, W = plot.clientWidth, L = 62, R = 6, T = 10;
+      var band = (W - L - R) / qs.length, named = band >= 70, perLine = Math.floor(band / 6.3);
+      var labels = qs.map(function (q) { return named ? wrap(q.id + ". " + q.title, perLine) : [String(q.id)]; });
+      var lines = Math.max.apply(null, labels.map(function (l) { return l.length; }));
+      var B = 16 + 13 * lines, H = 186 + B;
+      var sites = ["before", "after"].filter(function (s) { return run.sites[s]; });
+      var value = function (q) { return measure === "works" ? q.works : q.cost; };
+      var max = measure === "works" ? run.repeats : nice(Math.max.apply(null, sites.map(function (s) {
+        return Math.max.apply(null, run.sites[s].questions.map(value)); })));
+      var ticks = measure === "works" ? Array.from({ length: run.repeats + 1 }, function (_, i) { return i; })
+                                      : [0, max / 2, max];
+      var y = function (v) { return T + (H - T - B) * (1 - v / max); };
+      var svg = el("svg", { width: W, height: H, role: "img",
+        "aria-label": run.label + ": " + (measure === "works" ? "answers with working code" : "average cost per answer") + " by question, before and after. The numbers are in the table below." });
+      ticks.forEach(function (t) {
+        svg.appendChild(el("line", { x1: L, x2: W - R, y1: y(t), y2: y(t), class: t ? "grid" : "base" }));
+        var label = el("text", { x: L - 6, y: y(t) + 4, class: "tick", "text-anchor": "end" });
+        label.textContent = measure === "works" ? t : tickMoney(t);
+        svg.appendChild(label);
+      });
+      var bar = Math.min(24, (band - 14) / 2);
+      qs.forEach(function (q, i) {
+        var mid = L + band * (i + 0.5);
+        var name = el("text", { x: mid, y: H - B + 16, class: "tick", "text-anchor": "middle" });
+        labels[i].forEach(function (line, k) {
+          var span = el("tspan", { x: mid, dy: k ? 13 : 0 });
+          span.textContent = line;
+          name.appendChild(span);
+        });
+        svg.appendChild(name);
+        sites.forEach(function (s, j) {
+          var row = run.sites[s].questions.filter(function (r) { return r.id === q.id; })[0];
+          if (!row) return;
+          var x = j === 0 ? mid - 1 - bar : mid + 1, v = value(row), top = y(v);
+          if (v > 0) svg.appendChild(el("path", { d: column(x, top, bar, y(0) - top), class: "mark " + s }));
+          var hit = el("rect", { x: x - 3, y: T, width: bar + 6, height: H - T - B, class: "hit", tabindex: 0 });
+          var tip = [measure === "works" ? row.works + " of " + row.answers + " worked" : money(row.cost) + " per answer",
+                     s === "before" ? "Before" : "After", q.id + ". " + q.title];
+          hit.setAttribute("aria-label", tip.join(", "));
+          hit.addEventListener("pointerenter", function () { show(fig, tip, x + bar / 2, top); });
+          hit.addEventListener("focus", function () { show(fig, tip, x + bar / 2, top); });
+          hit.addEventListener("pointerleave", function () { hide(fig); });
+          hit.addEventListener("blur", function () { hide(fig); });
+          svg.appendChild(hit);
+        });
+      });
+      var midY = T + (H - T - B) / 2;
+      var yTitle = el("text", { x: 12, y: midY, class: "axis-title", "text-anchor": "middle", transform: "rotate(-90 12 " + midY + ")" });
+      yTitle.textContent = measure === "works" ? "Attempts" : "Average cost per answer";
+      svg.appendChild(yTitle);
+      plot.replaceChildren(svg);
+    }
+    function show(fig, lines, x, y) {
+      var tip = fig.querySelector(".viz-tip") || fig.appendChild(document.createElement("div"));
+      tip.className = "viz-tip";
+      tip.replaceChildren();
+      var strong = document.createElement("strong"); strong.textContent = lines[0]; tip.appendChild(strong);
+      lines.slice(1).forEach(function (l) { var s = document.createElement("span"); s.textContent = l; tip.appendChild(s); });
+      var plot = fig.querySelector(".plot");
+      tip.style.left = Math.min(Math.max(x, 70), plot.clientWidth - 70) + "px";
+      tip.style.top = (plot.offsetTop + y - 8) + "px";
+      tip.hidden = false;
+    }
+    function hide(fig) { var tip = fig.querySelector(".viz-tip"); if (tip) tip.hidden = true; }
+    var figs = document.querySelectorAll(".results .chart");
+    figs.forEach(render);
+    if (window.ResizeObserver) {
+      var widths = new Map();
+      var ro = new ResizeObserver(function (entries) {
+        entries.forEach(function (e) {
+          var w = Math.round(e.contentRect.width);
+          if (widths.get(e.target) !== w) { widths.set(e.target, w); render(e.target.closest(".chart")); }
+        });
+      });
+      figs.forEach(function (f) { ro.observe(f.querySelector(".plot")); });
+    }
+  })();
+  </script>
+  {{ end }}
+
+  {{ with .Params.pairs }}
+  <section class="sees" id="what-the-agent-sees">
+    <h2>What the agent sees</h2>
+    <p class="note">An AI agent doesn't see the page the same way a human sees it. It reads the text behind it. Each page below shows both: <strong class="v-b">Before</strong>, what an agent gets from the HTML page, and <strong class="v-a">After</strong>, what it gets from the new docs.</p>
+  </section>
+  {{ range . }}
+    {{ $path := cond (eq .page "_index") "" (printf "/%s" .page) }}
+    {{ $b := site.GetPage (printf "/before%s" $path) }}
+    {{ $a := site.GetPage (printf "/after%s" $path) }}
+  <section class="pair">
+    <h2>{{ .label }}</h2>
+    <p class="note">{{ replace (replace (.note | markdownify) "<strong>Before</strong>" `<strong class="v-b">Before</strong>`) "<strong>After</strong>" `<strong class="v-a">After</strong>` | safeHTML }}</p>
+    <div class="cols">
+      <div class="col b">
+        <p class="col-head"><strong class="v-b">Before</strong> · <a href="{{ $b.RelPermalink }}">HTML page</a> (no Markdown, no llms.txt)</p>
+        <pre>{{ partial "agent-text.txt" $b | htmlUnescape }}</pre>
+      </div>
+      <div class="col a">
+        {{ if .llms }}
+        <p class="col-head"><strong class="v-a">After</strong> · <a href="{{ "after/llms.txt" | relURL }}">llms.txt</a></p>
+        <pre>{{ trim (partial "llms.txt" $) "\n" }}</pre>
+        {{ else }}
+        <p class="col-head"><strong class="v-a">After</strong> · <a href="{{ ($a.OutputFormats.Get "markdown").RelPermalink }}">Markdown version</a></p>
+        <pre>{{ trim (partial "page-md.txt" $a | htmlUnescape) "\n" }}</pre>
+        {{ end }}
+      </div>
+    </div>
+  </section>
+  {{ end }}
+  {{ end }}
+
+  {{ $demo := "https://cal.com/asergaz" }}
+  <section class="drift" id="book-a-demo">
+    <h2>See what the agent did</h2>
+    <p class="note">In our call, you'll go through the runs behind these results, answer by answer.</p>
+    <ul class="steps">
+      <li><strong>The agent at work.</strong> Each page it opened, what it asked about each one, and the moment it gave up on the docs and went to the raw spec.</li>
+      <li><strong>The code it wrote, run again in front of you.</strong> The request it sends to the mock API, what the API answers, and whether it works.</li>
+      <li><strong>What each answer costs.</strong> Tokens, pages, time and dollars, with Haiku 5.5 and Opus 5.5 side by side.</li>
+      <li><strong>Why the <span class="v-a">After</span> docs win.</strong> The pages that make the difference, and how the <a href="{{ "docs-tests/" | relURL }}">docs tests</a> keep them right when the API changes.</li>
+    </ul>
+    <a class="cta" href="{{ $demo }}" target="_blank" rel="noopener">Book a call →</a>
+  </section>
+  {{ partial "book-bar.html" (dict "title" "See what the agent did" "url" $demo) }}
+  <script>
+  function openNumbers() { if (location.hash === "#all-the-numbers") document.getElementById("all-the-numbers").open = true; }
+  openNumbers(); window.addEventListener("hashchange", openNumbers);
+  document.querySelectorAll(".pair .cols").forEach(function (cols) {
+    var seg = document.createElement("div");
+    seg.className = "seg"; seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Version shown");
+    [["b", "Before"], ["a", "After"]].forEach(function (v) {
+      var btn = document.createElement("button");
+      btn.type = "button"; btn.className = v[0]; btn.textContent = v[1];
+      btn.addEventListener("click", function () { pick(v[0]); });
+      seg.appendChild(btn);
+    });
+    function pick(which) {
+      cols.dataset.show = which;
+      seg.querySelectorAll("button").forEach(function (b) { b.setAttribute("aria-pressed", b.className === which); });
+    }
+    cols.parentNode.insertBefore(seg, cols);
+    pick("b");
+  });
+  </script>
+</main>
+{{ end }}

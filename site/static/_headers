@@ -1,0 +1,11 @@
+/before/*
+  X-Robots-Tag: noindex
+/after/*
+  X-Robots-Tag: noindex
+
+/agent-view-*
+  X-Robots-Tag: noindex
+
+# The project's pages.dev copy of the live site.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex

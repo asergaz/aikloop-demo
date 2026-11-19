@@ -1,0 +1,28 @@
+{{- $params := slice -}}
+{{- $headers := slice -}}
+{{- $body := "" -}}
+{{- range .op.parameters -}}
+  {{- if eq .in "header" -}}
+    {{- $headers = $headers | append (dict "name" .name "description" .description) -}}
+  {{- else -}}
+    {{- $params = $params | append (dict "name" .name "type" .schema.type "description" .description) -}}
+  {{- end -}}
+{{- end -}}
+{{- with .op.requestBody -}}
+  {{- range $type, $_ := .content }}{{ $body = $type }}{{ end -}}
+  {{- with index .content "application/x-www-form-urlencoded" -}}
+    {{- $props := .schema.properties -}}
+    {{- $required := .schema.required | default slice -}}
+    {{- range $name := $required -}}
+      {{- with index $props $name -}}
+        {{- $params = $params | append (dict "name" $name "type" .type "description" .description) -}}
+      {{- end -}}
+    {{- end -}}
+    {{- range $name, $p := $props -}}
+      {{- if not (in $required $name) -}}
+        {{- $params = $params | append (dict "name" $name "type" $p.type "description" $p.description) -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- return dict "method" .method "path" .path "summary" .op.summary "body" $body "params" $params "headers" $headers -}}

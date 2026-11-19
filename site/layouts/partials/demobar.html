@@ -1,0 +1,28 @@
+{{- $here := .RelPermalink -}}
+{{- $home := strings.TrimSuffix "/" site.Params.asergazURL -}}
+<header class="demo-head">
+  <div class="demo-wrap demo-brandrow">
+    {{- if $home }}
+    <a class="brand" href="{{ $home }}/"><img class="brand-logo" src="{{ "favicon.svg" | relURL }}" width="48" height="48" alt="asergaz"></a>
+    <nav class="demo-site" aria-label="asergaz">
+      <a href="{{ $home }}/knowledge-loop/" aria-current="true">Knowledge Loop</a>
+      <a href="{{ $home }}/edge-ai-path/">Edge AI Path</a>
+    </nav>
+    {{- else }}
+    <span class="brand"><img class="brand-logo" src="{{ "favicon.svg" | relURL }}" width="48" height="48" alt="asergaz"></span>
+    {{- end }}
+  </div>
+</header>
+<div class="demo-tabs">
+  <div class="demo-wrap">
+    <span class="demo-label">Knowledge Loop demo</span>
+    <nav aria-label="Demo">
+      <a href="{{ "" | relURL }}"{{ if .IsHome }} aria-current="page"{{ end }}>Overview</a>
+      <a href="{{ "before/" | relURL }}" class="b" target="_blank" rel="noopener">Before<span class="ext"> ↗</span></a>
+      <a href="{{ "after/" | relURL }}" class="a" target="_blank" rel="noopener">After<span class="ext"> ↗</span></a>
+      {{- range slice (dict "path" "agent-view/" "name" "Agent view") (dict "path" "docs-tests/" "name" "Docs tests") }}
+      <a href="{{ .path | relURL }}"{{ if eq $here (.path | relURL) }} aria-current="page"{{ end }}>{{ .name }}</a>
+      {{- end }}
+    </nav>
+  </div>
+</div>

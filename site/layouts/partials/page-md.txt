@@ -1,0 +1,3 @@
+# {{ .Title }}
+
+{{ if eq .Layout "reference" }}{{ partial "reference-md.txt" . }}{{ else }}{{ trim .RawContent "\n" }}{{ end }}

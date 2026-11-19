@@ -1,0 +1,4 @@
+{{- $version := (partial "current-spec.html" .).info.version -}}
+{{- range resources.Match "specs/*.json" -}}
+  {{- if eq (index (transform.Unmarshal .) "info" "version") $version }}{{ .Content }}{{ end -}}
+{{- end -}}
